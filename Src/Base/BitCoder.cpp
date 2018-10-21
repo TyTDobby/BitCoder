@@ -13,10 +13,10 @@
 #include <fstream>
 #include <string>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+//#include <boost/property_tree/ptree.hpp>
+//#include <boost/property_tree/json_parser.hpp>
 
-namespace pt = boost::property_tree;
+//namespace pt = boost::property_tree;
 
 BitCoder::BitCoder(FrameBase *parent)
     : FrameBase(parent)
@@ -68,7 +68,7 @@ BitCoder::BitCoder(FrameBase *parent)
 //                SLOT(close()));
 //    }
 //    else {
-        pt::ptree root;
+//        pt::ptree root;
         try {
             //read_json(fileSetting.c_str(), root);
         }
@@ -105,12 +105,13 @@ BitCoder::~BitCoder()
 
 void BitCoder::createFileOrPro()
 {
-    CreateWidget *createWidget = new CreateWidget();
+    //CreateWidget *createWidget = new CreateWidget();
 
+    Dialog *dialog = new Dialog();
+    dialog->show();
 
-
-    createWidget->show();
-    createWidget->setVisible(true);
+    //createWidget->show();
+    //createWidget->setVisible(true);
 
 }
 

@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <QLayout>
 #include <QResizeEvent>
+#include <QAbstractNativeEventFilter>
 
 typedef struct {
     QPen pen;
@@ -27,7 +28,7 @@ class FrameBase : public QWidget
 {
     Q_OBJECT
 public:
-    FrameBase(QWidget *parent = 0);
+    FrameBase(QWidget *parent = nullptr);
 
     void setTitleText(QString title);
     void setTitleIcon(QString path);
@@ -58,7 +59,7 @@ private:
     QFont titleFont;
     WindowButton btns;
     QWidget *widget;
-
+    QColor colorBorder;
     void paintBtnClose(QPainter &paint);
     void paintBtnMaximized(QPainter &paint);
     void paintBtnMinimized(QPainter &paint);
@@ -70,4 +71,3 @@ private:
 
 
 };
-

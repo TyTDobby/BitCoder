@@ -50,19 +50,19 @@ void MessageBox::showMessage(QString text)
     label->setWordWrap(true);
     QPixmap pixmap;
     if (type == Warning) {
-        pixmap.loadFromData((unsigned char*)iconWarn, sizeIconWarn);
+        pixmap.loadFromData(&iconWarn[0], sizeIconWarn);
         setTitleText("Warning");
     }
     else if (type == Information) {
-        pixmap.loadFromData((unsigned char*)iconInfo, sizeIconInfo);
+        pixmap.loadFromData(&iconInfo[0], sizeIconInfo);
         setTitleText("Info");
     }
     else if (type == FatalError) {
-        pixmap.loadFromData((unsigned char*)iconFatalError, sizeIconFatalError);
+        pixmap.loadFromData(&iconFatalError[0], sizeIconFatalError);
         setTitleText("Fatal error");
     }
     else if (type == Question) {
-        pixmap.loadFromData((unsigned char*)iconQuestion, sizeIconQuestion);
+        pixmap.loadFromData(&iconQuestion[0], sizeIconQuestion);
         setTitleText("Help");
     }
     icon->setPixmap(pixmap);

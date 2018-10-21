@@ -31,13 +31,9 @@ QStringList listDirs(QString path, QStringList exception)
 
 int main(int argc, char *argv[])
 {
-//    QApplication a(argc, argv);
-//    BitCoder w;
-//    w.show();
+    QApplication a(argc, argv);
+    BitCoder w;
+    w.show();
 
-//    return a.exec();
-
-
-
-    return 0;
+    return a.exec();
 }

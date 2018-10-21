@@ -21,7 +21,9 @@ Dialog::Dialog(QWidget *parent) : FrameBase(parent)
     cmbType = new QComboBox();
     editDirectory = new QLineEdit();
     view = new QListView();
-    model = new QDirModel();
+    viewHard = new QListView();
+    model = new DirModel();
+    modelHard = new DirModel();
 
     QVBoxLayout *vBoxMain = new QVBoxLayout();
 
@@ -46,6 +48,7 @@ Dialog::Dialog(QWidget *parent) : FrameBase(parent)
     lu_2->addWidget(cmbType);
     lu_2->addWidget(btnCancel);
 
+    lu_3->addWidget(viewHard);
     lu_3->addWidget(view);
 
     vBoxMain->addLayout(lu_3);
@@ -57,10 +60,13 @@ Dialog::Dialog(QWidget *parent) : FrameBase(parent)
     vBoxMain->setMargin(5);
 
     model->setFilter(QDir::Dirs | QDir::NoDot);
-
+//    model->iconProvider()->setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
 
     view->setModel(model);
     view->setRootIndex(model->index(QDir::homePath()));
+
+    viewHard->setFixedWidth(static_cast<int>(this->width() * 0.2));
+    viewHard->setModel(modelHard);
 
     editDirectory->setText(QDir::homePath());
 
@@ -75,11 +81,22 @@ Dialog::Dialog(QWidget *parent) : FrameBase(parent)
 
     connect(view, SIGNAL(doubleClicked(QModelIndex)),
             SLOT(changeDir(QModelIndex)));
+    connect(viewHard, SIGNAL(doubleClicked(QModelIndex)),
+            SLOT(changeHard(QModelIndex)));
     connect(btnCancel, SIGNAL(clicked(bool)),
             SLOT(close()));
     connect(btnOpen, SIGNAL(clicked(bool)),
             SLOT(open()));
+    connect(editDirectory, SIGNAL(textChanged(QString)),
+            SLOT(changeText(QString)));
 
+}
+
+void Dialog::changeHard(QModelIndex index)
+{
+//    editDirectory->clear();
+    editDirectory->setText(index.data().toString());
+//    view->setRootIndex(index);
 }
 
 void Dialog::changeDir(QModelIndex index)
@@ -87,6 +104,14 @@ void Dialog::changeDir(QModelIndex index)
     editDirectory->clear();
     editDirectory->setText(model->filePath(index));
     view->setRootIndex(index);
+}
+
+void Dialog::changeText(QString text)
+{
+    QDir dir(text);
+    if (dir.exists()) {
+        view->setRootIndex(model->index(text));
+    }
 }
 
 void Dialog::open()

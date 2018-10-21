@@ -4,6 +4,7 @@
 
 #include "TreeProject.h"
 #include "CreateWidget.h"
+#include "Dialog.h"
 
 class BitCoder : public FrameBase
 {

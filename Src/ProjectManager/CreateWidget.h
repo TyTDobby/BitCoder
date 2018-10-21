@@ -45,7 +45,7 @@ class CreateWidget : public FrameBase
 {
     Q_OBJECT
 public:
-    CreateWidget(QWidget *parent = 0);
+    CreateWidget(QWidget *parent = nullptr);
 
     ~CreateWidget();
    void fileCreate();

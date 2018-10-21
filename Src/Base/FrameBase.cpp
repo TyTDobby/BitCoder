@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QTextOption>
 #include <QLabel>
+#include <QFile>
+#include <QIODevice>
 
 FrameBase::FrameBase(QWidget *parent)
     : QWidget(parent)
@@ -17,6 +19,8 @@ FrameBase::FrameBase(QWidget *parent)
     isBtnClsUpdate = false;
     isBtnMaxUpdate = false;
     isBtnMinUpdate = false;
+
+    colorBorder = QColor(49, 51, 53);
 
     eventShowCount = 0;
 
@@ -32,11 +36,15 @@ FrameBase::FrameBase(QWidget *parent)
                         size().width() - widthBorder * 2,
                         size().height() - heightTitle - widthBorder * 2);
     widget->adjustSize();
-    this->setWindowFlags(Qt::CustomizeWindowHint);
+    this->setWindowFlags(Qt::FramelessWindowHint | Qt::CustomizeWindowHint);
     this->setGeometry(QStyle::alignedRect(Qt::LeftToRight,
                                           Qt::AlignCenter,
-                                          this->size(), QApplication::desktop()->availableGeometry()));
+                                          this->size(), QApplication::desktop()->screenGeometry()));
     this->setMouseTracking(true);
+    QFile file(":qdarkstyle/style.qss");
+    file.open(QFile::ReadOnly | QFile::Text);
+
+    this->setStyleSheet(file.readAll());
 //    this->setLayout(boxLayout);
     widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     paramMain.pen = QPen(QBrush(QColor(200, 200, 200)), 1);
@@ -90,7 +98,8 @@ void FrameBase::setWindowButtons(WindowButton btns)
 void FrameBase::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
-    QPen pen = QPen(QBrush(QColor(64, 66, 68)), 4);
+//    if ()
+    QPen pen = QPen(QBrush(colorBorder), 4);
     QPainter paint(this);
 
     paint.setRenderHint(QPainter::Antialiasing);
@@ -100,7 +109,7 @@ void FrameBase::paintEvent(QPaintEvent *event)
     paint.setPen(pen);
     paint.fillRect(0, 0,
                    this->width(),
-                   heightTitle + widthBorder, QBrush(QColor(64, 66, 68)));
+                   heightTitle + widthBorder, QBrush(colorBorder));
     paint.drawRect(0, 0,
                    this->width(),
                    this->height());
@@ -153,11 +162,16 @@ void FrameBase::mouseMoveEvent(QMouseEvent *event)
         lastPoint = point;
     }
 
-    /* Button close */
+    /* Buttons */
     isBtnClsUpdate = isBtnClose(pos);
     isBtnMaxUpdate = isBtnMaximized(pos);
     isBtnMinUpdate = isBtnMinimized(pos);
-    update();
+    if (isBtnClsUpdate || isBtnMaxUpdate || isBtnMinUpdate) {
+        update(this->width() - paramBtnClose.w - paramBtnMax.w - paramBtnMin.w - 8,
+               0,
+               paramBtnClose.w + paramBtnMax.w + paramBtnMin.w + 8,
+               heightTitle + widthBorder);
+    }
 }
 
 void FrameBase::mousePressEvent(QMouseEvent *event)
@@ -242,11 +256,11 @@ void FrameBase::paintBtnClose(QPainter &paint)
 {
     paint.drawLine(this->width() - paramBtnClose.w,
                    (heightTitle / 3) + widthBorder,
-                   this->width() - paramBtnClose.w + (heightTitle / 2.5),
-                   (heightTitle / 3) + widthBorder + (heightTitle / 2.5));
+                   static_cast<int>(this->width() - paramBtnClose.w + (heightTitle / 2.5)),
+                   static_cast<int>((heightTitle / 3) + widthBorder + (heightTitle / 2.5)));
     paint.drawLine(this->width() - paramBtnClose.w,
-                   (heightTitle / 3) + widthBorder + (heightTitle / 2.5),
-                   this->width() - paramBtnClose.w + (heightTitle / 2.5),
+                   static_cast<int>((heightTitle / 3) + widthBorder + (heightTitle / 2.5)),
+                   static_cast<int>(this->width() - paramBtnClose.w + (heightTitle / 2.5)),
                    (heightTitle / 3) + widthBorder);
 }
 
@@ -254,8 +268,8 @@ void FrameBase::paintBtnMaximized(QPainter &paint)
 {
     paint.drawRect(this->width() - paramBtnClose.w - paramBtnMax.w + 2,
                    (heightTitle / 3) + widthBorder,
-                   (heightTitle / 2.5),
-                   (heightTitle / 2.5));
+                   static_cast<int>((heightTitle / 2.5)),
+                   static_cast<int>((heightTitle / 2.5)));
 }
 
 void FrameBase::paintBtnMinimized(QPainter &paint)

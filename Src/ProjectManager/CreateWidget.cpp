@@ -6,12 +6,12 @@
 
 #include <fstream>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+//#include <boost/property_tree/ptree.hpp>
+//#include <boost/property_tree/json_parser.hpp>
 
 #include "Dialog.h"
 
-namespace pt = boost::property_tree;
+//namespace pt = boost::property_tree;
 
 Compiler addComnpiler (QString name, QString mask, QString path) {
     Compiler compiler;
@@ -167,9 +167,9 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     /* 4 step */
 
     title->setVisible(false);
-    QFont font(title->font().family(), 10);
-    font.setWeight(1000);
-    title->setFont(font);
+//    QFont font(title->font().family(), 10);
+//    font.setWeight(99);
+//    title->setFont(font);
 
     listCreate << "New\nfile" << "Project\nSTM8" << "Project\nSTM32";
     QStringList listIcon;
@@ -246,7 +246,7 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 #endif
 
 
-    QStringList listFiles = binDir.entryList(QDir::Files);
+//    QStringList listFiles = binDir.entryList(QDir::Files);
 
     setTitleText("New file or project");
 

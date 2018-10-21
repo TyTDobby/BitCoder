@@ -28,7 +28,7 @@ QVariant ListModel::data(const QModelIndex &index, int role) const
 
 bool ListModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if(role == (int)Qt::EditRole)
+    if(role == Qt::EditRole)
         listValue.replace(index.row(), value.toString());
     return true;
 
