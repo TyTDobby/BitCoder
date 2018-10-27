@@ -3,6 +3,10 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QStandardItemModel>
+#include <QVector>
+#include "Project.h"
+#include "ProjectModel.h"
+//using namespace Project;
 
 class TreeProject : public QWidget
 {
@@ -14,7 +18,12 @@ public:
 
 private:
     QTreeView *treeView;
-    QStandardItemModel *treeModel;
+    ProjectModel *treeModel;
+    std::vector <Project::ProjectInfo> projects;
+
+public slots:
+    void addProject(Project::ProjectInfo pro);
+    void open(QModelIndex index);
 
 };
 

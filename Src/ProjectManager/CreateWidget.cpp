@@ -4,7 +4,7 @@
 #include <QLayout>
 #include <QRegExpValidator>
 
-#include <fstream>
+#include <QTemporaryFile>
 
 //#include <boost/property_tree/ptree.hpp>
 //#include <boost/property_tree/json_parser.hpp>
@@ -13,13 +13,13 @@
 
 //namespace pt = boost::property_tree;
 
-Compiler addComnpiler (QString name, QString mask, QString path) {
-    Compiler compiler;
-    compiler.name = name;
-    compiler.mask = mask;
-    compiler.path = path;
-    return compiler;
-}
+//Compiler addComnpiler (QString name, QString mask, QString path) {
+//    Compiler compiler;
+//    compiler.name = name;
+//    compiler.mask = mask;
+//    compiler.path = path;
+//    return compiler;
+//}
 
 CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 {
@@ -32,25 +32,28 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     select = true;
     startView = new QListView(this);
     seriaView = new QListView(this);
+    coreView = new QListView(this);
     viewDrivers = new QListView(this);
     crystalView = new QListView(this);
     btnCancel = new QPushButton("Cancel", this);
     btnNext = new QPushButton("Choose", this);
     btnBack = new QPushButton("Back", this);
     btnBrowse = new QPushButton("Browse...", this);
-    btnCompilerPath = new QPushButton("Browse...", this);
+    crPro = new CreateProject(this);
+//    btnCompilerPath = new QPushButton("Browse...", this);
     wgName = new QWidget(this);
     wgCrystal = new QWidget(this);
     wgFolders = new QWidget(this);
-    wgCompiler = new QWidget(this);
+//    wgCompiler = new QWidget(this);
     editName = new QLineEdit(this);
     editPath = new QLineEdit(this);
     editInc = new QLineEdit(this);
+//    editOutput = new QLineEdit(this);
     editLibs = new QLineEdit(this);
     editOther = new QLineEdit(this);
     editSrc = new QLineEdit(this);
-    editCompilerPath = new QLineEdit(this);
-    editCompilerName = new QLineEdit(this);
+//    editCompilerPath = new QLineEdit(this);
+//    editCompilerName = new QLineEdit(this);
     title = new QLabel(this);
     editInfo = new QTextEdit(this);
     downloader = new Downloader(this);
@@ -60,7 +63,7 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     QVBoxLayout *luCentral = new QVBoxLayout();
     QHBoxLayout *luCrystal = new QHBoxLayout();
     QVBoxLayout *luFolders = new QVBoxLayout();
-    QVBoxLayout *luCompiler = new QVBoxLayout();
+//    QVBoxLayout *luCompiler = new QVBoxLayout();
     QFormLayout *luName = new QFormLayout();
     QHBoxLayout *lu = new QHBoxLayout();
     QVBoxLayout *lu_1 = new QVBoxLayout();
@@ -68,17 +71,17 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     QFormLayout *lu_3 = new QFormLayout();
     QFormLayout *lu_4 = new QFormLayout();
     QHBoxLayout *lu_5 = new QHBoxLayout();
-    QHBoxLayout *lu_6 = new QHBoxLayout();
-    QHBoxLayout *lu_7 = new QHBoxLayout();
+//    QHBoxLayout *lu_6 = new QHBoxLayout();
+//    QHBoxLayout *lu_7 = new QHBoxLayout();
     QSpacerItem *spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);
     QSpacerItem *spacer_1 = new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Expanding);
-    QLabel *seria = new QLabel("Seria", this);
-    QLabel *crystalName = new QLabel("Crystal", this);
+//    QLabel *seria = new QLabel("Seria", this);
+//    QLabel *crystalName = new QLabel("Crystal", this);
     QLabel *label = new QLabel("Library", this);
     QLabel *label_1 = new QLabel("Driver and tools", this);
     QComboBox *boxLib = new QComboBox(this);
 
-    QString appPath = QApplication::applicationDirPath();
+//    QString appPath = QApplication::applicationDirPath();
 
     selectLayout(luMain);
 
@@ -97,19 +100,19 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     luCentral->addWidget(wgName);
     luCentral->addWidget(wgCrystal);
     luCentral->addWidget(wgFolders);
-    luCentral->addWidget(wgCompiler);
+//    luCentral->addWidget(wgCompiler);
 //    luCentral->addSpacerItem(spacer_1);
     luCentral->addWidget(progress);
 
     wgName->setLayout(luName);
     wgCrystal->setLayout(luCrystal);
     wgFolders->setLayout(luFolders);
-    wgCompiler->setLayout(luCompiler);
+//    wgCompiler->setLayout(luCompiler);
 
     wgName->setVisible(false);
     wgCrystal->setVisible(false);
     wgFolders->setVisible(false);
-    wgCompiler->setVisible(false);
+//    wgCompiler->setVisible(false);
 
     /* 1 step */
     lu->addWidget(editPath);
@@ -129,9 +132,11 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     lu_1->addWidget(editInfo);
     lu_1->addSpacerItem(spacer_1);
 
-    lu_2->addWidget(seria);
+    lu_2->addWidget(new QLabel("Core", this));
+    lu_2->addWidget(coreView);
+    lu_2->addWidget(new QLabel("Seria", this));
     lu_2->addWidget(seriaView);
-    lu_2->addWidget(crystalName);
+    lu_2->addWidget(new QLabel("Crysral", this));
     lu_2->addWidget(crystalView);
     /* 2 step */
 
@@ -153,16 +158,16 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     /* 3 step */
 
     /* 4 step */
-    luCompiler->addLayout(lu_7);
-    luCompiler->addLayout(lu_6);
-    luCompiler->addSpacerItem(new QSpacerItem(2, 2, QSizePolicy::Fixed, QSizePolicy::Expanding));
+//    luCompiler->addLayout(lu_7);
+//    luCompiler->addLayout(lu_6);
+//    luCompiler->addSpacerItem(new QSpacerItem(2, 2, QSizePolicy::Fixed, QSizePolicy::Expanding));
 
-    lu_6->addWidget(new QLabel("Directory:"));
-    lu_6->addWidget(editCompilerPath);
-    lu_6->addWidget(btnCompilerPath);
+//    lu_6->addWidget(new QLabel("Directory:"));
+//    lu_6->addWidget(editCompilerPath);
+//    lu_6->addWidget(btnCompilerPath);
 
-    lu_7->addWidget(new QLabel("Name:"));
-    lu_7->addWidget(editCompilerName);
+//    lu_7->addWidget(new QLabel("Name:"));
+//    lu_7->addWidget(editCompilerName);
 
     /* 4 step */
 
@@ -173,14 +178,17 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 
     listCreate << "New\nfile" << "Project\nSTM8" << "Project\nSTM32";
     QStringList listIcon;
-    listIcon << appPath + "/Theme/office/image/NewFile.png"
-             << appPath + "/Theme/office/image/ST.png"
-             << appPath + "/Theme/office/image/ST.png";
+    listIcon << ":icons/NewFile.png"
+             << ":icons/ST.png"
+             << ":icons/ST.png";
 
     model.setIcons(listIcon);
     model.setList(listCreate);
     startView->setModel(&model);
     startView->setViewMode(QListView::IconMode);
+
+    coreView->setModel(&modelCore);
+    coreView->setFixedWidth(150);
 
     seriaView->setModel(&modelSeria);
     seriaView->setObjectName("view");
@@ -200,8 +208,10 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     editInfo->setFixedSize(500, 300);
     editInfo->setText(info);
 
-    listSeria32 << "STM32L0" << "STM32L1" << "STM32L4" << "STM32F0" << "STM32F1"
-                << "STM32F3" << "STM32F2" << "STM32F4" << "STM32F7" << "STM32H7";
+    listSTM32 << "STM32L0" << "STM32L1" << "STM32L4" << "STM32F0" << "STM32F1"
+              << "STM32F3" << "STM32F2" << "STM32F4" << "STM32F7" << "STM32H7";
+
+    listCoreSTM32 << "ARM Cortex-M0" << "ARM Cortex-M0+" << "ARM Cortex-M3" << "ARM Cortex-M4" << "ARM Cortex-M7";
 
     listSeria8 << "STM8AF" << "STM8AL" << "STM8L" << "STM8S";
 
@@ -220,7 +230,8 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 
     progress->setVisible(false);
 
-    dataBase.connectToDataBase("STM");
+
+    dataBase.connectToDataBase(QDir::temp().absoluteFilePath("STM.db"));
 
     checkDefault.setText("Directory default");
     checkDefault.setVisible(false);
@@ -260,14 +271,16 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
             SLOT(back()));
     connect(btnCancel, SIGNAL(clicked(bool)),
             SLOT(close()));
+    connect(coreView, SIGNAL(clicked(QModelIndex)),
+            SLOT(selectionCoreSTM32(QModelIndex)));
     connect(seriaView, SIGNAL(clicked(QModelIndex)),
             SLOT(selectionSeria(QModelIndex)));
     connect(crystalView, SIGNAL(clicked(QModelIndex)),
             SLOT(selectionCrystal(QModelIndex)));
     connect(btnBrowse, SIGNAL(clicked(bool)),
             SLOT(browse()));
-    connect(btnCompilerPath, SIGNAL(clicked(bool)),
-            SLOT(browseCompiler()));
+//    connect(btnCompilerPath, SIGNAL(clicked(bool)),
+//            SLOT(browseCompiler()));
     connect(editName, SIGNAL(textChanged(QString)),
             SLOT(pathProject(QString)));
     connect(boxLib, SIGNAL(currentIndexChanged(QString)),
@@ -280,7 +293,7 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 
 CreateWidget::~CreateWidget()
 {
-
+    dataBase.closeDataBase();
 }
 
 void CreateWidget::fileCreate()
@@ -296,22 +309,22 @@ void CreateWidget::choose(const QModelIndex &index)
     startView->setVisible(false);
     QString strSelect = index.data().toString();
     if(strSelect == listCreate.at(0)) {
-        chooseCreate = File;
+        isFile = true;
         fileCreate();
     }
     else {
-
+        isFile = false;
         wgName->setVisible(true);
         checkDefault.setVisible(true);
         btnBack->setVisible(false);
         btnNext->setText("Next");
         if(strSelect == listCreate.at(1)) {
-            chooseCreate = ProjectSTM8;
+            typeProject = Project::Project_STM8;
             modelSeria.setList(listSeria8);
         }
         else if(strSelect == listCreate.at(2)) {
-            chooseCreate = ProjectSTM32;
-            modelSeria.setList(listSeria32);
+            typeProject = Project::Project_STM32;
+            modelCore.setList(listCoreSTM32);
         }
     }
 }
@@ -324,7 +337,7 @@ void CreateWidget::step(int index)
         setTitleText("Location");
         wgCrystal->setVisible(false);
         wgFolders->setVisible(false);
-        wgCompiler->setVisible(false);
+//        wgCompiler->setVisible(false);
         btnBack->setVisible(false);
         break;
     case 1:
@@ -332,7 +345,7 @@ void CreateWidget::step(int index)
         wgCrystal->setVisible(true);
         setTitleText("Crystal");
         wgFolders->setVisible(false);
-        wgCompiler->setVisible(false);
+//        wgCompiler->setVisible(false);
         btnBack->setVisible(true);
         btnNext->setText("Next");
         break;
@@ -341,25 +354,25 @@ void CreateWidget::step(int index)
         wgCrystal->setVisible(false);
         setTitleText("Folders");
         wgFolders->setVisible(true);
-        wgCompiler->setVisible(false);
-        btnNext->setText("Next");
+//        wgCompiler->setVisible(false);
+        btnNext->setText("Finish");
         break;
     case 3:
-        wgName->setVisible(false);
-        wgCrystal->setVisible(false);
-        setTitleText("Compiler");
-        wgFolders->setVisible(false);
-        wgCompiler->setVisible(true);
-        btnNext->setText("Finish");
+//        wgName->setVisible(false);
+//        wgCrystal->setVisible(false);
+//        setTitleText("Compiler");
+//        wgFolders->setVisible(false);
+//        wgCompiler->setVisible(true);
+//        btnNext->setText("Finish");
 
-        if (chooseCreate == ProjectSTM32) {
-            editCompilerName->setText("arm-none-eabi-gcc");
-        }
-        else if (chooseCreate == ProjectSTM8) {
-            editCompilerName->setText("sdcc");
-        }
+//        if (typeProject == Project::Project_STM32) {
+//            editCompilerName->setText("arm-none-eabi-gcc");
+//        }
+//        else if (typeProject == Project::Project_STM8) {
+//            editCompilerName->setText("sdcc");
+//        }
 
-        break;
+//        break;
     case 4:
         finish();
         break;
@@ -369,25 +382,33 @@ void CreateWidget::step(int index)
 
 void CreateWidget::finish()
 {
-    progress->setVisible(true);
-    QDir dirProject, dirLibs, dirOther, dirInc, dirSrc;
-    dirProject.mkdir(editPath->text());
-    dirLibs.mkdir(editPath->text() + "/" + editLibs->text());
-    dirOther.mkdir(editPath->text() + "/" + editOther->text());
-    dirInc.mkdir(editPath->text() + "/" + editInc->text());
-    dirSrc.mkdir(editPath->text() + "/" + editSrc->text());
-    progress->setValue(20);
+    if (!isFile) {
+//        QString linkerScriptDir = "Linker";
+        QFileInfo linkerFile(":/Linker/stm3210x.ld");
 
-//    std::fstream jsonFile;
-//    jsonFile.open(QString(editPath->text() + "/build.json").toStdString(), std::ios::trunc | std::ios::out);
+        hide();
+        connect(crPro, SIGNAL(done(Project::ProjectInfo)),
+                SLOT(done(Project::ProjectInfo)));
+        Project::ProjectInfo project(editName->text(), editPath->text());
 
-//    pt::ptree json;
+//        project.setCompilerName(editCompilerName->text());
+//        project.setCompilerPath(editCompilerPath->text());
+        project.setCoreSTM32(coreSTM32.replace("ARM ", "").toLower());
+        project.setTypeProject(typeProject);
+        project.setOutputDir("Build");
+        project.setLinkerScript(linkerFile.absoluteFilePath());
 
-//    json.put("Target", editName->text().toStdString());
-//    json.put("Includes", editName->text().toStdString());
-
-
-//    write_json(jsonFile, json);
+        project.setDirs(QStringList()
+                        << editInc->text()
+                        << editLibs->text()
+                        << editOther->text()
+                        << editSrc->text()
+                        << "Startup"
+                        << linkerFile.dir().dirName());
+        project.setFilter(QStringList() << "*.c");
+        crPro->show();
+        crPro->generation(project);
+    }
 }
 
 void CreateWidget::selectionItem(const QModelIndex &index)
@@ -404,10 +425,10 @@ void CreateWidget::next()
     }
     else {
         if (!editName->text().isEmpty()) {
-            if(chooseCreate != File) {
+            if(!isFile) {
                 count++;
-                if(count >= 3)
-                    count = 3;
+                if(count >= 4)
+                    count = 4;
                 step(count);
             }
             else {
@@ -429,6 +450,19 @@ void CreateWidget::selectionSeria(const QModelIndex &index)
 {
     selSeria = index.data().toString();
     modelCrystal.setList(dataBase.readSeria(selSeria));
+}
+
+void CreateWidget::selectionCoreSTM32(const QModelIndex &index)
+{
+//    selSeria = index.data().toString();
+    QStringList list;
+    coreSTM32 = index.data().toString();
+    for (auto &it : listSTM32) {
+        if(dataBase.loadCoreSTM32(it, coreSTM32).size() != 0) {
+            list << it;
+        }
+    }
+    modelSeria.setList(list);
 }
 
 void CreateWidget::selectionCrystal(const QModelIndex &index)
@@ -463,12 +497,19 @@ void CreateWidget::browse()
             SLOT(browsePath(QString)));
 }
 
-void CreateWidget::browseCompiler()
+//void CreateWidget::browseCompiler()
+//{
+//    Dialog *dialog = new Dialog();
+//    dialog->show();
+//    connect(dialog, SIGNAL(result(QString)),
+//            editCompilerPath, SLOT(setText(QString)));
+//}
+
+void CreateWidget::done(Project::ProjectInfo pro)
 {
-    Dialog *dialog = new Dialog();
-    dialog->show();
-    connect(dialog, SIGNAL(result(QString)),
-            editCompilerPath, SLOT(setText(QString)));
+    crPro->close();
+    close();
+    emit projectReady(pro);
 }
 
 void CreateWidget::pathProject(const QString &name)
@@ -493,15 +534,11 @@ void CreateWidget::selectLib(const QString &select)
 
 void CreateWidget::download(const QByteArray &byte)
 {
-
     QFile file(QApplication::applicationDirPath() + "/Firmware/" + seriaView->currentIndex().data().toString() + ".zip");
     if(file.open(QIODevice::WriteOnly)) {
         file.write(byte);
         file.close();
     }
-//    progress->setVisible(false);
-//    qDebug() << "File created!";
-
 }
 
 void CreateWidget::downloadProgress(int total)

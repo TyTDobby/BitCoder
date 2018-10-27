@@ -21,7 +21,7 @@
 #include "ListModel.h"
 #include "Downloader.h"
 #include "FrameBase.h"
-
+#include "CreateProject.h"
 
 
 #define CRYSTAL_NAME   0
@@ -33,13 +33,16 @@
 #define DATASHEET      7
 #define CORE           6
 
+//typedef struct {
+//    QString name;
+//    QString mask;
+//    QString path;
+//} Compiler;
+
 typedef struct {
-    QString name;
-    QString mask;
-    QString path;
-} Compiler;
-
-
+    QString Seria;
+    QStringList Crystals;
+} STM32;
 
 class CreateWidget : public FrameBase
 {
@@ -51,41 +54,41 @@ public:
    void fileCreate();
 
 private:
-    enum Create{
-        File,
-        ProjectSTM8,
-        ProjectSTM32
-    };
     QWidget *wgName, *wgCrystal, *wgFolders, *wgCompiler;
-    QPushButton *btnCancel, *btnNext, *btnBack, *btnBrowse, *btnCompilerPath;
-    QListView *startView, *seriaView, *crystalView, *viewDrivers;
-    QLineEdit *editPath, *editName, *editInc, *editSrc, *editLibs, *editOther, *editCompilerPath, *editCompilerName;
+    QPushButton *btnCancel, *btnNext, *btnBack, *btnBrowse;// *btnCompilerPath;
+    QListView *startView, *seriaView, *crystalView, *viewDrivers, *coreView;
+    QLineEdit *editPath, *editName, *editInc, *editSrc, *editLibs, *editOther;
+//    QLineEdit *editCompilerPath, *editCompilerName;
+    CreateProject *crPro;
     QLabel *title;
     QTextEdit *editInfo;
-    ListModel modelSeria, modelCrystal, model, modelDrivers;
+    ListModel modelSeria, modelCrystal, model, modelDrivers, modelCore;
     DataBase dataBase;
-    QStringList listCreate, listSeria32, listSeria8, crystalInfo, libs, cubeHAL;
-    Create chooseCreate;
+    QStringList listCreate, listCoreSTM32, listSeria8, listSTM32, crystalInfo, libs, cubeHAL;
+    Project::TypeProject typeProject;
     QCheckBox checkDefault;
     Downloader *downloader;
     QProgressBar *progress;
-    QVector<Compiler> compilers;
+//    QVector<Compiler> compilers;
+    QMap<QString, STM32> stm32;
 
-    QString selSeria, info, defaultDir;
+    QString coreSTM32, selSeria, info, defaultDir;
     int count;
     bool select;
+    bool isFile;
 
-private:
     void choose(const QModelIndex &index);
     void step(int index);
     void finish();
 
 signals:
+    void projectReady(Project::ProjectInfo);
 
 public slots:
     void selectionItem(const QModelIndex &index);
     void next();
     void back();
+    void selectionCoreSTM32(const QModelIndex &index);
     void selectionSeria(const QModelIndex &index);
     void selectionCrystal(const QModelIndex &index);
     void browse();
@@ -95,8 +98,8 @@ public slots:
     void downloadProgress(int total);
 //    void compilerPath(QString &value);
     void browsePath(QString path);
-    void browseCompiler();
-
+//    void browseCompiler();
+    void done(Project::ProjectInfo);
 protected:
     void closeEvent(QCloseEvent *event);
 

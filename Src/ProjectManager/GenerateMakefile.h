@@ -1,11 +1,9 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <algorithm>
-#include <fstream>
+#include <QObject>
+#include <QFile>
+#include <QString>
+#include <QVector>
 
 namespace Makefile{
 
@@ -15,7 +13,6 @@ typedef enum {
     NameEmpty,
     RootEmpty
 
-
 } Error;
 
 typedef enum TypeVariable{
@@ -24,13 +21,13 @@ typedef enum TypeVariable{
 } TypeVariable;
 
 typedef struct {
-    std::string name;
-    std::string var;
+    QString name;
+    QString var;
 } Var;
 
 //typedef struct {
-//    std::string name;
-//    std::string value;
+//    QString name;
+//    QString value;
 //} Variable;
 
 typedef int ToolIndex;
@@ -47,29 +44,38 @@ class Generator
 public:
     Generator();
 
-    void setBuildDir(std::string build);
-    void setRootDir(std::string root);
-    void setTargetName(std::string target);
+    void setBuildDir(QString build);
+    void setRootDir(QString root);
+    void setTargetName(QString target);
 
     ToolIndex addTool(Tool tool);
     RuleIndex addRule(Rule rule);
     VariableIndex addVariable(Variable var);
-    void addIfeq(std::string ifElse, std::string acIf, std::string acElse = "");
+    void addIfeq(QString ifElse, QString acIf, QString acElse = "");
+
+    void addPHONY(Rule *rules);
+
+    QString wildcard(QString pattern);
+    QString addprefix(QString prefix, QString names);
+    QString subst(QString from, QString to, QString text);
+    QString echo(QString text);
 
     Error generate();
 
-    std::string getBuildDir();
-    std::string getNameBuildDir();
-    std::string &getRootDir();
-    std::string getTargetName();
+    QString getBuildDir();
+    QString getNameBuildDir();
+    QString &getRootDir();
+    QString getTargetName();
 
     Variable *getVariable(VariableIndex index);
     Rule *getRule(RuleIndex index);
     Tool *getTool(ToolIndex index);
+
 private:
     Var target, build;
-    std::string root;
-    std::string ifeq;
+    QString root;
+    QString ifeq;
+    QString PHONY;
     std::vector<Tool> tools;
     std::vector<Rule> rules;
     std::vector<Variable> vars;
@@ -78,56 +84,56 @@ private:
 class Rule
 {
 public:
-    Rule(std::string name, std::string dep, std::string action);
+    Rule(QString name, QString dep, QString action);
 
-    void addAction(std::string action);
-    void addDep(std::string dep);
+    void addAction(QString action);
+    void addDep(QString dep);
 
-    void setName(std::string name);
+    void setName(QString name);
 
-    std::string &getName(void);
-    std::string &getDep(void);
-    std::string &getActions(void);
+    QString &getName(void);
+    QString &getDep(void);
+    QString &getActions(void);
 
 private:
-    std::string name, dep, actions;
+    QString name, dep, actions;
 };
 
 class Variable
 {
 public:
-    Variable(std::string nameVar, std::string val);
+    Variable(QString nameVar, QString val = "");
 
-    void addVal(std::string val);
+    void addVal(QString val);
 
-    void setName(std::string nameVar);
+    void setName(QString nameVar);
     void setTypeVar(TypeVariable type);
 
-    std::string &getName(void);
-    std::string var(void);
-    std::vector<std::string> &getVal(void);
+    QString &getName(void);
+    QString var(void);
+    QVector<QString> &getVal(void);
     TypeVariable getTypeVar();
 
 private:
-    std::string nameVar;
-    std::vector<std::string> val;
+    QString nameVar;
+    QVector<QString> val;
     TypeVariable typeVar;
 };
 
 class Tool
 {
 public:
-    Tool(std::string name, std::string path);
+    Tool(QString name, QString path);
 
-    void setName(std::string name);
-    void setPath(std::string path);
+    void setName(QString name);
+    void setPath(QString path);
 
-    std::string var(void);
-    std::string &getName();
-    std::string &getPath(void);
+    QString var(void);
+    QString &getName();
+    QString &getPath(void);
 
 private:
-    std::string name, path;
+    QString name, path;
 };
 
 }

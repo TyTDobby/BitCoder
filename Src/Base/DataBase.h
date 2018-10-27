@@ -19,9 +19,11 @@ public:
     explicit DataBase(QObject *parent = 0);
     ~DataBase();
     void connectToDataBase(QString bit);
+    void removeConnection();
 
     QStringList readCryatslInfo(QString crystal, QString seria);
     QStringList readSeria(QString seria);
+    QStringList loadCoreSTM32(QString table, QString core);
     void closeDataBase();
 
 private:

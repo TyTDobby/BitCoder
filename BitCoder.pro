@@ -16,7 +16,7 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
+DEFINES +=  QT_DEBUG_PLUGINS
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -30,7 +30,7 @@ INCLUDEPATH += Src/Base/
 INCLUDEPATH += Src/ProjectManager/
 
 RESOURCES += qdarkstyle/style.qrc \
-    Resources/icons.qrc
+    Resources/Common.qrc
 
 HEADERS += \
     Src/Base/BitCoder.h \
@@ -45,19 +45,9 @@ HEADERS += \
     Src/ProjectManager/ListModel.h \
     Src/ProjectManager/TreeProject.h \
     Src/ProjectManager/Project.h \
-    Src/Base/BitCoder.h \
-    Src/Base/DataBase.h \
-    Src/Base/Dialog.h \
     Src/Base/DirModel.h \
-    Src/Base/Downloader.h \
-    Src/Base/FrameBase.h \
-    Src/Base/MessageBox.h \
-    Src/ProjectManager/CreateWidget.h \
-    Src/ProjectManager/GenerateMakefile.h \
-    Src/ProjectManager/Icons.h \
-    Src/ProjectManager/ListModel.h \
-    Src/ProjectManager/Project.h \
-    Src/ProjectManager/TreeProject.h
+    Src/ProjectManager/CreateProject.h \
+    Src/ProjectManager/ProjectModel.h
 
 SOURCES += \
     Src/Base/BitCoder.cpp \
@@ -72,18 +62,6 @@ SOURCES += \
     Src/ProjectManager/ListModel.cpp \
     Src/ProjectManager/TreeProject.cpp \
     Src/ProjectManager/Project.cpp \
-    Src/Base/BitCoder.cpp \
-    Src/Base/DataBase.cpp \
-    Src/Base/Dialog.cpp \
     Src/Base/DirModel.cpp \
-    Src/Base/Downloader.cpp \
-    Src/Base/FrameBase.cpp \
-    Src/Base/main.cpp \
-    Src/Base/MessageBox.cpp \
-    Src/ProjectManager/CreateWidget.cpp \
-    Src/ProjectManager/GenerateMakefile.cpp \
-    Src/ProjectManager/ListModel.cpp \
-    Src/ProjectManager/Project.cpp \
-    Src/ProjectManager/TreeProject.cpp
-
-
+    Src/ProjectManager/CreateProject.cpp \
+    Src/ProjectManager/ProjectModel.cpp

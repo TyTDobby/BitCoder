@@ -34,6 +34,8 @@ public:
     void setTitleIcon(QString path);
     void setTitleFont(QFont font);
 
+    void hideBorder();
+
     void selectLayout(QLayout *l);
     void setWindowButtons(WindowButton btns);
 
@@ -51,6 +53,7 @@ private:
     ParamPainter paramMain, paramBtnClose, paramBtnMin, paramBtnMax;
     bool isShowMaximized, isShowMinimized, isMovingWindow;
     bool isBtnMaxUpdate, isBtnClsUpdate, isBtnMinUpdate;
+    bool isUpdated;
     int eventShowCount;
     QPoint lastPoint;
     QColor clButtons;
@@ -60,6 +63,8 @@ private:
     WindowButton btns;
     QWidget *widget;
     QColor colorBorder;
+    bool isShowenBorder;
+
     void paintBtnClose(QPainter &paint);
     void paintBtnMaximized(QPainter &paint);
     void paintBtnMinimized(QPainter &paint);

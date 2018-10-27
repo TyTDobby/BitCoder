@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>folder.png</file>
+        <file>hdd.png</file>
+        <file>file.png</file>
+        <file>NewFile.png</file>
+        <file>ST.png</file>
+    </qresource>
+    <qresource prefix="/db">
+        <file>STM.db</file>
+    </qresource>
+    <qresource prefix="/Linker">
+        <file>LinkerScript/stm3210x.ld</file>
+    </qresource>
+</RCC>

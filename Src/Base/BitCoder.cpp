@@ -87,7 +87,12 @@ BitCoder::BitCoder(FrameBase *parent)
 
     selectLayout(boxMain);
     setTitleText("BitCoder");
-    setTitleIcon("/home/alex/Downloads/fold1.png");
+    /* Creating tmp files */
+    if (!QFile::exists(QDir::temp().absoluteFilePath("STM.db"))) {
+        qDebug() << "Creating STM database!";
+        QFile::copy(":/db/STM.db", QDir::temp().absoluteFilePath("STM.db"));
+    }
+
     setTitleFont(QFont("Courier", 11, QFont::Black));
 
     connect(acCreateFile, SIGNAL(triggered(bool)),
@@ -105,12 +110,13 @@ BitCoder::~BitCoder()
 
 void BitCoder::createFileOrPro()
 {
-    //CreateWidget *createWidget = new CreateWidget();
+    CreateWidget *createWidget = new CreateWidget();
+    connect(createWidget, SIGNAL(projectReady(Project::ProjectInfo)),
+            treeProject, SLOT(addProject(Project::ProjectInfo)));
+//    Dialog *dialog = new Dialog();
+//    dialog->show();
 
-    Dialog *dialog = new Dialog();
-    dialog->show();
-
-    //createWidget->show();
+    createWidget->show();
     //createWidget->setVisible(true);
 
 }

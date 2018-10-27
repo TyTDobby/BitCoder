@@ -20,6 +20,11 @@ FrameBase::FrameBase(QWidget *parent)
     isBtnMaxUpdate = false;
     isBtnMinUpdate = false;
 
+    isShowenBorder = true;
+
+    isUpdated = false;
+
+    titleFont = QFont("Courier", 11, QFont::Black);
     colorBorder = QColor(49, 51, 53);
 
     eventShowCount = 0;
@@ -45,7 +50,7 @@ FrameBase::FrameBase(QWidget *parent)
     file.open(QFile::ReadOnly | QFile::Text);
 
     this->setStyleSheet(file.readAll());
-//    this->setLayout(boxLayout);
+    //    this->setLayout(boxLayout);
     widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     paramMain.pen = QPen(QBrush(QColor(200, 200, 200)), 1);
     paramMain.h = this->height() - heightTitle - widthBorder * 2;
@@ -64,6 +69,8 @@ FrameBase::FrameBase(QWidget *parent)
     paramBtnMin.h = heightTitle;
     paramBtnMin.w = heightTitle;
     btns = AllButton;
+
+
 }
 
 void FrameBase::setTitleText(QString title)
@@ -83,6 +90,13 @@ void FrameBase::setTitleFont(QFont font)
     titleFont = font;
 }
 
+void FrameBase::hideBorder()
+{
+    isShowenBorder = false;
+    widget->setFixedSize(this->size());
+    widget->adjustSize();
+}
+
 void FrameBase::selectLayout(QLayout *l)
 {
     widget->setContentsMargins(0, 0, 0, 0);
@@ -98,7 +112,7 @@ void FrameBase::setWindowButtons(WindowButton btns)
 void FrameBase::paintEvent(QPaintEvent *event)
 {
     QWidget::paintEvent(event);
-//    if ()
+    //    if ()
     QPen pen = QPen(QBrush(colorBorder), 4);
     QPainter paint(this);
 
@@ -106,44 +120,61 @@ void FrameBase::paintEvent(QPaintEvent *event)
     paint.setRenderHint(QPainter::HighQualityAntialiasing);
 
     /* Drawing border and title */
-    paint.setPen(pen);
-    paint.fillRect(0, 0,
-                   this->width(),
-                   heightTitle + widthBorder, QBrush(colorBorder));
-    paint.drawRect(0, 0,
-                   this->width(),
-                   this->height());
+    if (isShowenBorder) {
+        paint.setPen(pen);
+        paint.fillRect(0, 0,
+                       this->width(),
+                       heightTitle + widthBorder, QBrush(colorBorder));
+        paint.drawRect(0, 0,
+                       this->width(),
+                       this->height());
 
-    pen.setWidth(2);
-    paint.setPen(pen);
-    /* Drawing close button */
-    if (btns & Closed) {
-        pen.setBrush(QBrush(isBtnClsUpdate ? QColor(152, 169, 238) : QColor(189, 191, 193)));
+        pen.setWidth(2);
         paint.setPen(pen);
-        paintBtnClose(paint);
-    }
-    /* Drawing maximized button */
-    if (btns & Maximized) {
-        pen.setBrush(QBrush(isBtnMaxUpdate ? QColor(152, 169, 238) : QColor(189, 191, 193)));
+        /* Drawing close button */
+        if (btns & Closed) {
+            pen.setBrush(QBrush(isBtnClsUpdate ? QColor(152, 169, 238) : QColor(189, 191, 193)));
+            paint.setPen(pen);
+            paintBtnClose(paint);
+        }
+        /* Drawing maximized button */
+        if (btns & Maximized) {
+            pen.setBrush(QBrush(isBtnMaxUpdate ? QColor(152, 169, 238) : QColor(189, 191, 193)));
+            paint.setPen(pen);
+            paintBtnMaximized(paint);
+        }
+        /* Drawing minimized button */
+        if (btns & Minimized) {
+            pen.setBrush(QBrush(isBtnMinUpdate ? QColor(152, 169, 238) : QColor(189, 191, 193)));
+            paint.setPen(pen);
+            paintBtnMinimized(paint);
+        }
+        /* Drawing title text */
+        pen.setBrush(QBrush(QColor(189, 191, 193)));
         paint.setPen(pen);
-        paintBtnMaximized(paint);
-    }
-    /* Drawing minimized button */
-    if (btns & Minimized) {
-        pen.setBrush(QBrush(isBtnMinUpdate ? QColor(152, 169, 238) : QColor(189, 191, 193)));
-        paint.setPen(pen);
-        paintBtnMinimized(paint);
-    }
-    /* Drawing title text */
-    pen.setBrush(QBrush(QColor(189, 191, 193)));
-    paint.setPen(pen);
-    paint.setFont(titleFont);
-    paint.drawText((this->width() - paramBtnClose.w - paramBtnMin.w - paramBtnMax.w) / 2,
-                   heightTitle - widthBorder * 2,
-                   titleText);
+        paint.setFont(titleFont);
+        QFontMetrics fm(titleFont);
 
-    /* Drawing title icon */
-    paint.drawImage(widthBorder * 2, widthBorder * 2, titleIcon);
+        float xPos = static_cast<float>(this->width() - titleIcon.width());
+        if (btns & WindowButton::Closed) {
+            xPos -= paramBtnClose.w;
+        }
+        if (btns & WindowButton::Minimized) {
+            xPos -= paramBtnMin.w;
+        }
+        if (btns & WindowButton::Maximized) {
+            xPos -= paramBtnMax.w;
+        }
+        xPos -= fm.width(titleText);
+        xPos /= 2;
+        xPos -= titleIcon.width();
+        paint.drawText(static_cast<int>(xPos),
+                       heightTitle - widthBorder * 2,
+                       titleText);
+
+        /* Drawing title icon */
+        paint.drawImage(widthBorder * 2, widthBorder * 2, titleIcon);
+    }
 
 }
 
@@ -161,16 +192,27 @@ void FrameBase::mouseMoveEvent(QMouseEvent *event)
              pointWindow.y() - yDelta);
         lastPoint = point;
     }
+    if (isShowenBorder) {
+        /* Buttons */
+        isBtnClsUpdate = isBtnClose(pos);
+        isBtnMaxUpdate = isBtnMaximized(pos);
+        isBtnMinUpdate = isBtnMinimized(pos);
 
-    /* Buttons */
-    isBtnClsUpdate = isBtnClose(pos);
-    isBtnMaxUpdate = isBtnMaximized(pos);
-    isBtnMinUpdate = isBtnMinimized(pos);
-    if (isBtnClsUpdate || isBtnMaxUpdate || isBtnMinUpdate) {
-        update(this->width() - paramBtnClose.w - paramBtnMax.w - paramBtnMin.w - 8,
-               0,
-               paramBtnClose.w + paramBtnMax.w + paramBtnMin.w + 8,
-               heightTitle + widthBorder);
+        if (isUpdated) {
+            update(this->width() - paramBtnClose.w - paramBtnMax.w - paramBtnMin.w - 8,
+                   0,
+                   paramBtnClose.w + paramBtnMax.w + paramBtnMin.w + 8,
+                   heightTitle + widthBorder);
+            isUpdated = false;
+        }
+
+        if (isBtnClsUpdate || isBtnMaxUpdate || isBtnMinUpdate) {
+            update(this->width() - paramBtnClose.w - paramBtnMax.w - paramBtnMin.w - 8,
+                   0,
+                   paramBtnClose.w + paramBtnMax.w + paramBtnMin.w + 8,
+                   heightTitle + widthBorder);
+            isUpdated = true;
+        }
     }
 }
 
@@ -178,10 +220,17 @@ void FrameBase::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
     QPoint pos = event->pos();
-    if (isTitle(pos)) {
+    if (isShowenBorder) {
+        if (isTitle(pos)) {
+            lastPoint = event->globalPos();
+            isMovingWindow = true;
+        }
+    }
+    else {
         lastPoint = event->globalPos();
         isMovingWindow = true;
     }
+
 }
 
 void FrameBase::mouseReleaseEvent(QMouseEvent *event)
@@ -190,11 +239,11 @@ void FrameBase::mouseReleaseEvent(QMouseEvent *event)
     QPoint pos = event->pos();
     isMovingWindow = false;
     /* Button close */
-    if (isBtnClose(pos)) {
+    if (isBtnClose(pos) && btns & WindowButton::Closed) {
         close();
     }
     /* Button maximized */
-    if (isBtnMaximized(pos)) {
+    if (isBtnMaximized(pos) && btns & WindowButton::Maximized) {
         if (!this->isMaximized()) {
             showMaximized();
             isShowMaximized = true;
@@ -205,7 +254,7 @@ void FrameBase::mouseReleaseEvent(QMouseEvent *event)
         }
     }
     /* Button minimized */
-    if (isBtnMinimized(pos)) {
+    if (isBtnMinimized(pos) && btns & WindowButton::Minimized) {
         showMinimized();
         isShowMinimized = true;
     }
@@ -283,31 +332,31 @@ void FrameBase::paintBtnMinimized(QPainter &paint)
 bool FrameBase::isBtnClose(QPoint &pos)
 {
     return  pos.rx() > this->width() - paramBtnClose.w - widthBorder &&
-           (pos.rx() < this->width() - widthBorder) &&
+            (pos.rx() < this->width() - widthBorder) &&
             pos.ry() > widthBorder &&
-           (pos.ry() < widthBorder + paramBtnClose.h);
+            (pos.ry() < widthBorder + paramBtnClose.h);
 }
 
 bool FrameBase::isBtnMaximized(QPoint &pos)
 {
     return  pos.rx() > this->width() - paramBtnClose.w - paramBtnMax.w - widthBorder &&
-           (pos.rx() < this->width() - paramBtnClose.w - widthBorder) &&
+            (pos.rx() < this->width() - paramBtnClose.w - widthBorder) &&
             pos.ry() > widthBorder &&
-           (pos.ry() < widthBorder + paramBtnMax.h);
+            (pos.ry() < widthBorder + paramBtnMax.h);
 }
 
 bool FrameBase::isBtnMinimized(QPoint &pos)
 {
     return  pos.rx() > this->width() - paramBtnClose.w - paramBtnMin.w - paramBtnMax.w - widthBorder &&
-           (pos.rx() < this->width() - paramBtnClose.w - paramBtnMax.w - widthBorder) &&
+            (pos.rx() < this->width() - paramBtnClose.w - paramBtnMax.w - widthBorder) &&
             pos.ry() > widthBorder &&
-           (pos.ry() < widthBorder + paramBtnMin.h);
+            (pos.ry() < widthBorder + paramBtnMin.h);
 }
 
 bool FrameBase::isTitle(QPoint &pos)
 {
     return  pos.rx() > widthBorder &&
-           (pos.rx() < this->width() - paramBtnClose.w - paramBtnMin.w - paramBtnMax.w - widthBorder) &&
+            (pos.rx() < this->width() - paramBtnClose.w - paramBtnMin.w - paramBtnMax.w - widthBorder) &&
             pos.ry() > widthBorder &&
-           (pos.ry() < widthBorder + heightTitle);
+            (pos.ry() < widthBorder + heightTitle);
 }

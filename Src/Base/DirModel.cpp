@@ -1,7 +1,4 @@
 #include "DirModel.h"
-#include "Icons.h"
-
-#include <QDebug>
 
 DirModel::DirModel(QObject *parent) : QDirModel (parent)
 {

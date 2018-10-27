@@ -59,8 +59,8 @@ Dialog::Dialog(QWidget *parent) : FrameBase(parent)
 
     vBoxMain->setMargin(5);
 
-    model->setFilter(QDir::Dirs | QDir::NoDot);
-//    model->iconProvider()->setOptions(QFileIconProvider::DontUseCustomDirectoryIcons);
+    model->setFilter(QDir::Dirs | QDir::Files | QDir::NoDot);
+    model->setSorting(QDir::Type);
 
     view->setModel(model);
     view->setRootIndex(model->index(QDir::homePath()));
