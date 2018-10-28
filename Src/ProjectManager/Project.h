@@ -2,15 +2,16 @@
 
 #include <string>
 #include <vector>
+#include <iterator>
 
-#include <QDirIterator>
 #include <QDirIterator>
 #include <QVector>
-
+#include <QMap>
 #include "GenerateMakefile.h"
-
+#include "ProjectItem.h"
 
 namespace Project {
+
 
 typedef enum {
     FlagLinker,
@@ -37,25 +38,26 @@ typedef struct {
     QString Value;
 } Flag;
 
-struct SystenBuild{
+struct SystemBuild{
     QString Name;
     QString Path;
     QStringList Flags;
 } ;
 
-typedef SystenBuild Compiler;
-typedef SystenBuild Linker;
+typedef SystemBuild Compiler;
+typedef SystemBuild Linker;
 
-class ProjectInfo
+class Project
 {
 public:
-    ProjectInfo(QString NameTarget, QString RootDir);
+    Project(QString NameTarget, QString RootDir);
 
 
     void generateProject();
 
-    QStringList getListDirs();
-    QStringList getListFiles();
+    QStringList listDirs();
+    QStringList listFiles();
+    void projectFileSystem();
 
     QStringList getCompilerFlags() const;
     void setCompilerFlags(const QStringList &value);
@@ -102,6 +104,9 @@ public:
     QString getLinkerScript() const;
     void setLinkerScript(const QString &value);
 
+    ProjectItem *getRootItem() const;
+    void setRootItem(const ProjectItem *value);
+
 private:
     QString NameTarget, RootDir, OutputDir, LinkerScript;
     QStringList exception, dirs;
@@ -112,8 +117,7 @@ private:
     QString coreSTM32;
     QStringList filter;
     QStringList files;
-
-
+    ProjectItem *RootItem;
 };
 
 }

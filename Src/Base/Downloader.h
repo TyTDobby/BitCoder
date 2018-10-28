@@ -9,7 +9,7 @@ class Downloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit Downloader(QObject *parent = nullptr);
+    explicit Downloader(QObject *parent = NULL);
 
     void setUrl(const QUrl &url);
 

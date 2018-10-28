@@ -32,6 +32,8 @@ INCLUDEPATH += Src/ProjectManager/
 RESOURCES += qdarkstyle/style.qrc \
     Resources/Common.qrc
 
+CONFIG += c++11
+
 HEADERS += \
     Src/Base/BitCoder.h \
     Src/Base/DataBase.h \
@@ -47,7 +49,8 @@ HEADERS += \
     Src/ProjectManager/Project.h \
     Src/Base/DirModel.h \
     Src/ProjectManager/CreateProject.h \
-    Src/ProjectManager/ProjectModel.h
+    Src/ProjectManager/ProjectModel.h \
+    Src/ProjectManager/ProjectItem.h
 
 SOURCES += \
     Src/Base/BitCoder.cpp \
@@ -64,4 +67,5 @@ SOURCES += \
     Src/ProjectManager/Project.cpp \
     Src/Base/DirModel.cpp \
     Src/ProjectManager/CreateProject.cpp \
-    Src/ProjectManager/ProjectModel.cpp
+    Src/ProjectManager/ProjectModel.cpp \
+    Src/ProjectManager/ProjectItem.cpp

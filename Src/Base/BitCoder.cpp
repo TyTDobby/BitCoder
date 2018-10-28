@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QMenu>
 #include <QMenuBar>
+#include <QAction>
 
 #include <iostream>
 #include <fstream>
@@ -29,10 +30,10 @@ BitCoder::BitCoder(FrameBase *parent)
     QMenu *fileMenu = new QMenu("File", menuBar);
     QMenu *editMenu = new QMenu("Edit", menuBar);
 
-    QAction *acCreateFile = new QAction("Create file or project");
-    QAction *acOpenFile = new QAction("Open file or project");
+    QAction *acCreateFile = new QAction("Create file or project", fileMenu);
+    QAction *acOpenFile = new QAction("Open file or project", fileMenu);
 
-    QAction *acExit = new QAction("Exit");
+    QAction *acExit = new QAction("Exit", fileMenu);
 
     QHBoxLayout *hBoxTree = new QHBoxLayout();
 
@@ -73,7 +74,7 @@ BitCoder::BitCoder(FrameBase *parent)
             //read_json(fileSetting.c_str(), root);
         }
         catch (std::exception exp) {
-            MessageBox *box = new MessageBox(TypeBox::FatalError, this);
+            MessageBox *box = new MessageBox(FatalError, this);
             box->showMessage(QString("File \"%1\" no exist").arg(fileSetting.c_str()));
             connect(box, SIGNAL(fatalError()),
                     SLOT(close()));
@@ -100,7 +101,8 @@ BitCoder::BitCoder(FrameBase *parent)
 
     connect(acExit, SIGNAL(triggered(bool)),
             SLOT(close()));
-    createFileOrPro();
+
+//    treeProject->addProject(Project::Project("123", "C:/Users/lymanets/123"));
 }
 
 BitCoder::~BitCoder()
@@ -111,8 +113,8 @@ BitCoder::~BitCoder()
 void BitCoder::createFileOrPro()
 {
     CreateWidget *createWidget = new CreateWidget();
-    connect(createWidget, SIGNAL(projectReady(Project::ProjectInfo)),
-            treeProject, SLOT(addProject(Project::ProjectInfo)));
+    connect(createWidget, SIGNAL(projectReady(Project::Project)),
+            treeProject, SLOT(addProject(Project::Project)));
 //    Dialog *dialog = new Dialog();
 //    dialog->show();
 

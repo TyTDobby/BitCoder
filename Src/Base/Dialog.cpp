@@ -11,7 +11,7 @@
 Dialog::Dialog(QWidget *parent) : FrameBase(parent)
 {
     setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint | windowFlags());
-    setWindowButtons(WindowButton::Closed);
+    setWindowButtons(Closed);
     setTitleText("Browse");
 
     setFixedSize(680, 480);

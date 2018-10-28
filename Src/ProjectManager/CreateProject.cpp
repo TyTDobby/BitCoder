@@ -29,7 +29,7 @@ CreateProject::CreateProject(FrameBase *parent) : FrameBase(parent)
 
 }
 
-void CreateProject::generation(Project::ProjectInfo project)
+void CreateProject::generation(Project::Project project)
 {
     bar->setValue(0);
     bar->setFormat("Creating dirs");

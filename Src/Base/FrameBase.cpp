@@ -156,13 +156,13 @@ void FrameBase::paintEvent(QPaintEvent *event)
         QFontMetrics fm(titleFont);
 
         float xPos = static_cast<float>(this->width() - titleIcon.width());
-        if (btns & WindowButton::Closed) {
+        if (btns & Closed) {
             xPos -= paramBtnClose.w;
         }
-        if (btns & WindowButton::Minimized) {
+        if (btns & Minimized) {
             xPos -= paramBtnMin.w;
         }
-        if (btns & WindowButton::Maximized) {
+        if (btns & Maximized) {
             xPos -= paramBtnMax.w;
         }
         xPos -= fm.width(titleText);
@@ -239,11 +239,11 @@ void FrameBase::mouseReleaseEvent(QMouseEvent *event)
     QPoint pos = event->pos();
     isMovingWindow = false;
     /* Button close */
-    if (isBtnClose(pos) && btns & WindowButton::Closed) {
+    if (isBtnClose(pos) && btns & Closed) {
         close();
     }
     /* Button maximized */
-    if (isBtnMaximized(pos) && btns & WindowButton::Maximized) {
+    if (isBtnMaximized(pos) && btns & Maximized) {
         if (!this->isMaximized()) {
             showMaximized();
             isShowMaximized = true;
@@ -254,7 +254,7 @@ void FrameBase::mouseReleaseEvent(QMouseEvent *event)
         }
     }
     /* Button minimized */
-    if (isBtnMinimized(pos) && btns & WindowButton::Minimized) {
+    if (isBtnMinimized(pos) && btns & Minimized) {
         showMinimized();
         isShowMinimized = true;
     }

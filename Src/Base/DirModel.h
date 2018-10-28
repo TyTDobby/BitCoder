@@ -13,7 +13,7 @@ class DirModel : public QDirModel
 {
 
 public:
-    explicit DirModel(QObject *parent = nullptr);
+    explicit DirModel(QObject *parent = NULL);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 };

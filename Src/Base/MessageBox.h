@@ -2,12 +2,12 @@
 
 #include "FrameBase.h"
 
-typedef enum TypeBox{
+enum TypeBox{
     Information,
     Warning,
     FatalError,
     Question
-} TypeBox;
+};
 
 class MessageBox : public FrameBase
 {

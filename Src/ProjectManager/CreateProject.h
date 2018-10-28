@@ -19,12 +19,12 @@ class CreateProject : public FrameBase
 {
     Q_OBJECT
 public:
-    CreateProject(FrameBase *parent = nullptr);
+    CreateProject(FrameBase *parent = NULL);
 
-    void generation(Project::ProjectInfo project);
+    void generation(Project::Project project);
 
 signals:
-    void done(Project::ProjectInfo);
+    void done(Project::Project);
 
 private:
     QProgressBar *bar;

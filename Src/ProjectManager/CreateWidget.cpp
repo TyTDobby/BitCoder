@@ -387,9 +387,9 @@ void CreateWidget::finish()
         QFileInfo linkerFile(":/Linker/stm3210x.ld");
 
         hide();
-        connect(crPro, SIGNAL(done(Project::ProjectInfo)),
-                SLOT(done(Project::ProjectInfo)));
-        Project::ProjectInfo project(editName->text(), editPath->text());
+        connect(crPro, SIGNAL(done(Project::Project)),
+                SLOT(done(Project::Project)));
+        Project::Project project(editName->text(), editPath->text());
 
 //        project.setCompilerName(editCompilerName->text());
 //        project.setCompilerPath(editCompilerPath->text());
@@ -505,7 +505,7 @@ void CreateWidget::browse()
 //            editCompilerPath, SLOT(setText(QString)));
 //}
 
-void CreateWidget::done(Project::ProjectInfo pro)
+void CreateWidget::done(Project::Project pro)
 {
     crPro->close();
     close();

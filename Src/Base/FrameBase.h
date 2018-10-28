@@ -28,7 +28,7 @@ class FrameBase : public QWidget
 {
     Q_OBJECT
 public:
-    FrameBase(QWidget *parent = nullptr);
+    FrameBase(QWidget *parent = NULL);
 
     void setTitleText(QString title);
     void setTitleIcon(QString path);

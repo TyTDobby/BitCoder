@@ -6,23 +6,23 @@
 #include <QVector>
 #include "Project.h"
 #include "ProjectModel.h"
+#include "DirModel.h"
 //using namespace Project;
 
 class TreeProject : public QWidget
 {
     Q_OBJECT
 public:
-    TreeProject(QWidget *parent = 0);
+    TreeProject(QWidget *parent = NULL);
 
 
 
 private:
-    QTreeView *treeView;
-    ProjectModel *treeModel;
-    std::vector <Project::ProjectInfo> projects;
+    QTreeView *view;
+    ProjectModel *model;
 
 public slots:
-    void addProject(Project::ProjectInfo pro);
+    void addProject(Project::Project pro);
     void open(QModelIndex index);
 
 };

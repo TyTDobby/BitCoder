@@ -6,96 +6,96 @@
 namespace Project
 {
 
-ProjectInfo::ProjectInfo(QString NameTarget, QString RootDir)
+Project::Project(QString NameTarget, QString RootDir)
 {
     this->NameTarget = NameTarget;
     this->RootDir = RootDir;
     debugLevel = Level_4;
-
+    RootItem = new ProjectItem();
 }
 
-QString ProjectInfo::getCompilerName() const
+QString Project::getCompilerName() const
 {
     return compiler.Name;
 }
 
-void ProjectInfo::setCompilerName(const QString &value)
+void Project::setCompilerName(const QString &value)
 {
     compiler.Name = value;
 }
 
-QString ProjectInfo::getLinkerName() const
+QString Project::getLinkerName() const
 {
     return linker.Name;
 }
 
-void ProjectInfo::setLinkerName(const QString &value)
+void Project::setLinkerName(const QString &value)
 {
     linker.Name = value;
 }
 
-QString ProjectInfo::getCompilerPath() const
+QString Project::getCompilerPath() const
 {
     return compiler.Path;
 }
 
-void ProjectInfo::setCompilerPath(const QString &value)
+void Project::setCompilerPath(const QString &value)
 {
     compiler.Path = value.lastIndexOf("/") != value.size() - 1 ? value + "/" : value;
 }
 
-QString ProjectInfo::getLinkerPath() const
+QString Project::getLinkerPath() const
 {
     return linker.Path;
 }
 
-void ProjectInfo::setLinkerPath(const QString &value)
+void Project::setLinkerPath(const QString &value)
 {
     linker.Path = value.lastIndexOf("/") != value.size() - 1 ? value + "/" : value;
 }
 
-QString ProjectInfo::getCoreSTM32() const
+QString Project::getCoreSTM32() const
 {
     return coreSTM32;
 }
 
-void ProjectInfo::setCoreSTM32(const QString &value)
+void Project::setCoreSTM32(const QString &value)
 {
     coreSTM32 = value;
 }
 
-QStringList ProjectInfo::getFilter() const
+QStringList Project::getFilter() const
 {
     return filter;
 }
 
-void ProjectInfo::setFilter(const QStringList &value)
+void Project::setFilter(const QStringList &value)
 {
     filter = value;
 }
 
-QStringList ProjectInfo::getCompilerFlags() const
+QStringList Project::getCompilerFlags() const
 {
     return compiler.Flags;
 }
 
-void ProjectInfo::setCompilerFlags(const QStringList &value)
+void Project::setCompilerFlags(const QStringList &value)
 {
     compiler.Flags = value;
 }
 
 
-QStringList ProjectInfo::getLinkerFlags() const
+QStringList Project::getLinkerFlags() const
 {
     return linker.Flags;
 }
 
-void ProjectInfo::setLinkerFlags(const QStringList &value)
+void Project::setLinkerFlags(const QStringList &value)
 {
     linker.Flags = value;
 }
 
-void ProjectInfo::generateProject()
+void Project::generateProject()
 {
     Makefile::Generator make;
 
@@ -103,7 +103,7 @@ void ProjectInfo::generateProject()
     make.setRootDir(RootDir);
     make.setTargetName(NameTarget);
 
-    QStringList dirs = getListDirs();
+    QStringList dirs = listDirs();
 
     if (typeProject == Project_STM32) {
         compiler.Path = QApplication::applicationDirPath() + "/arm-gcc/bin/";
@@ -115,7 +115,8 @@ void ProjectInfo::generateProject()
 
         QFile linkerFile(RootDir + LinkerScript);
 
-        QFile tmpFile(":/LinkerScript/" + LinkerScript);
+        LinkerScript.replace("Linker", ":/Linker/LinkerScript");
+        QFile tmpFile(LinkerScript);
 
         linkerFile.open(QIODevice::WriteOnly);
         tmpFile.open(QIODevice::ReadOnly);
@@ -273,14 +274,14 @@ void ProjectInfo::generateProject()
         make.addPHONY(make.getRule(rule_clean));
         make.addPHONY(make.getRule(rule_all));
 
-        files = this->getListFiles();
-
+        files = this->listFiles();
+        projectFileSystem();
     }
 
     make.generate();
 }
 
-QStringList ProjectInfo::getListDirs()
+QStringList Project::listDirs()
 {
 
     QStringList list;
@@ -292,16 +293,15 @@ QStringList ProjectInfo::getListDirs()
     while(itr.hasNext()) {
         itr.next();
         QString dir = QString(itr.fileInfo().absoluteFilePath()).replace(0, RootDir.size() - 1, "") + "/";
-        if (dir.indexOf(OutputDir) == -1) {
+        if (dir.indexOf(OutputDir) != -1) {
             continue;
         }
         list.push_back(dir.replace(0, 1, ""));
     }
     return list;
-
 }
 
-QStringList ProjectInfo::getListFiles()
+QStringList Project::listFiles()
 {
     QStringList list;
     if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
@@ -317,72 +317,110 @@ QStringList ProjectInfo::getListFiles()
     return list;
 }
 
-QString ProjectInfo::getLinkerScript() const
+void Project::projectFileSystem()
+{
+    QStringList dirs = listDirs();
+    dirs.push_front("");
+    if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
+        RootDir += "/";
+    }
+
+    for (auto &dir_it : dirs) {
+        QString dirPath = RootDir + dir_it;
+        QDirIterator itr(dirPath, filter, QDir::Files | QDir::Dirs);
+        QStringList list;
+        while(itr.hasNext()) {
+            itr.next();
+
+//            if(dir_it.isEmpty()) {
+
+//            }
+//            else {
+
+//            }
+                    list << QString(itr.fileInfo().absoluteFilePath()).replace(0, RootDir.size(), "");
+        }
+        RootItem->insertChildren(list);
+    }
+//    return list;
+}
+
+QString Project::getLinkerScript() const
 {
     return LinkerScript;
 }
 
-void ProjectInfo::setLinkerScript(const QString &value)
+void Project::setLinkerScript(const QString &value)
 {
     LinkerScript = value;
 }
 
-QString ProjectInfo::getOutputDir() const
+void Project::setRootItem(const ProjectItem *value)
+{
+    *RootItem = *value;
+}
+
+ProjectItem *Project::getRootItem() const
+{
+    return RootItem;//static_cast<ProjectItem*>(&RootItem);
+}
+
+QString Project::getOutputDir() const
 {
     return OutputDir;
 }
 
-void ProjectInfo::setOutputDir(const QString &value)
+void Project::setOutputDir(const QString &value)
 {
     OutputDir = value;
 }
 
-QString ProjectInfo::getRootDir() const
+QString Project::getRootDir() const
 {
     return RootDir;
 }
 
-void ProjectInfo::setRootDir(const QString &value)
+void Project::setRootDir(const QString &value)
 {
     RootDir = value;
 }
 
-QString ProjectInfo::getNameTarget() const
+QString Project::getNameTarget() const
 {
     return NameTarget;
 }
 
-void ProjectInfo::setNameTarget(const QString &value)
+void Project::setNameTarget(const QString &value)
 {
     NameTarget = value;
 }
 
-QStringList ProjectInfo::getDirs() const
+QStringList Project::getDirs() const
 {
     return dirs;
 }
 
-void ProjectInfo::setDirs(const QStringList &value)
+void Project::setDirs(const QStringList &value)
 {
     dirs = value;
 }
 
-TypeProject ProjectInfo::getTypeProject() const
+TypeProject Project::getTypeProject() const
 {
     return typeProject;
 }
 
-void ProjectInfo::setTypeProject(const TypeProject &value)
+void Project::setTypeProject(const TypeProject &value)
 {
     typeProject = value;
 }
 
-DebugLevel ProjectInfo::getDebugLevel() const
+DebugLevel Project::getDebugLevel() const
 {
     return debugLevel;
 }
 
-void ProjectInfo::setDebugLevel(const DebugLevel &value)
+void Project::setDebugLevel(const DebugLevel &value)
 {
     debugLevel = value;
 }

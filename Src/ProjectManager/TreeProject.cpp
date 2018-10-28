@@ -6,29 +6,37 @@ TreeProject::TreeProject(QWidget *parent) : QWidget(parent)
 {
 
 
-    treeModel = new ProjectModel();
-    treeView = new QTreeView();
+    model = new ProjectModel();
+    view = new QTreeView();
 
     QVBoxLayout *vBoxMain = new QVBoxLayout();
 
-    vBoxMain->addWidget(treeView);
+    vBoxMain->addWidget(view);
 
-    treeView->setModel(treeModel);
+    Project::Project pro("123", "C:/Users/lymanets/123");
+    pro.setTypeProject(Project::Project_STM32);
+    pro.generateProject();
+//    model->addProject(pro);
 
+//    model->setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+//    model->setSorting(QDir::Type);
+
+    view->setModel(model);
+//    view->setRootIndex(model->index("C:/Users/lymanets/123"));
+//    view->set
     vBoxMain->setMargin(0);
 
     setFixedWidth(250);
     setLayout(vBoxMain);
 
-    connect(treeView, SIGNAL(doubleClicked(QModelIndex)),
+    connect(view, SIGNAL(doubleClicked(QModelIndex)),
             SLOT(open(QModelIndex)));
 
 }
 
-void TreeProject::addProject(Project::ProjectInfo pro)
+void TreeProject::addProject(Project::Project pro)
 {
-    treeView->setRootIndex(treeModel->index(pro.getRootDir()));
-    projects.push_back(pro);
+    model->addProject(pro);
 }
 
 void TreeProject::open(QModelIndex index)

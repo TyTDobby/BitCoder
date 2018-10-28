@@ -17,7 +17,7 @@ class Dialog : public FrameBase
 {
     Q_OBJECT
 public:
-    explicit Dialog(QWidget *parent = nullptr);
+    explicit Dialog(QWidget *parent = NULL);
 
 //    QString getPath();
 

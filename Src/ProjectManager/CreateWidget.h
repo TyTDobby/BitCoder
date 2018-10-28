@@ -48,7 +48,7 @@ class CreateWidget : public FrameBase
 {
     Q_OBJECT
 public:
-    CreateWidget(QWidget *parent = nullptr);
+    CreateWidget(QWidget *parent = NULL);
 
     ~CreateWidget();
    void fileCreate();
@@ -82,7 +82,7 @@ private:
     void finish();
 
 signals:
-    void projectReady(Project::ProjectInfo);
+    void projectReady(Project::Project);
 
 public slots:
     void selectionItem(const QModelIndex &index);
@@ -99,7 +99,7 @@ public slots:
 //    void compilerPath(QString &value);
     void browsePath(QString path);
 //    void browseCompiler();
-    void done(Project::ProjectInfo);
+    void done(Project::Project);
 protected:
     void closeEvent(QCloseEvent *event);
 
