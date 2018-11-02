@@ -8,7 +8,7 @@
 #include <QVector>
 #include <QMap>
 #include "GenerateMakefile.h"
-#include "ProjectItem.h"
+#include "Item.h"
 
 namespace Project {
 
@@ -57,7 +57,9 @@ public:
 
     QStringList listDirs();
     QStringList listFiles();
+    QFileInfoList listDirContent(QString dir, QStringList strFilter);
     void projectFileSystem();
+
 
     QStringList getCompilerFlags() const;
     void setCompilerFlags(const QStringList &value);
@@ -104,8 +106,8 @@ public:
     QString getLinkerScript() const;
     void setLinkerScript(const QString &value);
 
-    ProjectItem *getRootItem() const;
-    void setRootItem(const ProjectItem *value);
+    Item *getRootItem() const;
+    void setRootItem(const Item *value);
 
 private:
     QString NameTarget, RootDir, OutputDir, LinkerScript;
@@ -117,7 +119,9 @@ private:
     QString coreSTM32;
     QStringList filter;
     QStringList files;
-    ProjectItem *RootItem;
+    Item *RootItem;
+
+    void buildTree(Item *item, QString dir, QStringList strFilter);
 };
 
 }

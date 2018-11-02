@@ -405,7 +405,7 @@ void CreateWidget::finish()
                         << editSrc->text()
                         << "Startup"
                         << linkerFile.dir().dirName());
-        project.setFilter(QStringList() << "*.c");
+        //project.setFilter(QStringList() << "*.c");
         crPro->show();
         crPro->generation(project);
     }

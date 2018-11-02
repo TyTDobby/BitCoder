@@ -101,6 +101,8 @@ BitCoder::BitCoder(FrameBase *parent)
 
     connect(acExit, SIGNAL(triggered(bool)),
             SLOT(close()));
+    connect(treeProject, SIGNAL(openFile(QString)),
+            edit, SLOT(setPlainText(QString)));
 
 //    treeProject->addProject(Project::Project("123", "C:/Users/lymanets/123"));
 }

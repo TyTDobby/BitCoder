@@ -1,30 +1,32 @@
-#ifndef PROJECTMODEL_H
-#define PROJECTMODEL_H
-
+#pragma once
 #include <QAbstractItemModel>
 #include <QFileSystemModel>
 #include <QVector>
-#include <QDirModel>
+#include <QFileSystemModel>
+
+#include <QtAlgorithms>
 
 #include "Project.h"
-#include "ProjectItem.h"
+#include "Item.h"
 
-class ProjectModel : public QAbstractItemModel
+namespace Project {
+
+class Model : public QAbstractItemModel
 {
 public:
-    ProjectModel(QObject *parent = NULL);
+    Model(QObject *parent = nullptr);
 
 public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &child) const;
+    QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
 
-    void addProject(Project::Project pro);
+    void addProject(Project pro);
 
 private:
-    std::vector<Project::Project> projects;
+    Item *root;
 };
 
-#endif // PROJECTMODEL_H
+}

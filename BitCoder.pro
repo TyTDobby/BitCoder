@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui sql network
+QT += testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +23,6 @@ DEFINES +=  QT_DEBUG_PLUGINS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 #LIBS += \
 #       -lboost_system\
 
@@ -32,7 +32,7 @@ INCLUDEPATH += Src/ProjectManager/
 RESOURCES += qdarkstyle/style.qrc \
     Resources/Common.qrc
 
-CONFIG += c++11
+CONFIG += c++0x
 
 HEADERS += \
     Src/Base/BitCoder.h \
@@ -49,8 +49,8 @@ HEADERS += \
     Src/ProjectManager/Project.h \
     Src/Base/DirModel.h \
     Src/ProjectManager/CreateProject.h \
-    Src/ProjectManager/ProjectModel.h \
-    Src/ProjectManager/ProjectItem.h
+    Src/ProjectManager/Model.h \
+    Src/ProjectManager/Item.h
 
 SOURCES += \
     Src/Base/BitCoder.cpp \
@@ -67,5 +67,5 @@ SOURCES += \
     Src/ProjectManager/Project.cpp \
     Src/Base/DirModel.cpp \
     Src/ProjectManager/CreateProject.cpp \
-    Src/ProjectManager/ProjectModel.cpp \
-    Src/ProjectManager/ProjectItem.cpp
+    Src/ProjectManager/Model.cpp \
+    Src/ProjectManager/Item.cpp

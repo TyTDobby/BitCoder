@@ -11,7 +11,7 @@ Project::Project(QString NameTarget, QString RootDir)
     this->NameTarget = NameTarget;
     this->RootDir = RootDir;
     debugLevel = Level_4;
-    RootItem = new ProjectItem();
+    RootItem = new Item(QFileInfo(RootDir));
 }
 
 QString Project::getCompilerName() const
@@ -275,27 +275,29 @@ void Project::generateProject()
         make.addPHONY(make.getRule(rule_all));
 
         files = this->listFiles();
-        projectFileSystem();
+
     }
 
     make.generate();
+
+    RootItem->~Item();
+    RootItem = new Item(QFileInfo(RootDir));
+    buildTree(RootItem, RootDir, filter);
+
 }
 
 QStringList Project::listDirs()
 {
 
     QStringList list;
-    if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
-        RootDir += "/";
-    }
+    //if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
+   //     RootDir += "/";
+   // }
 
     QDirIterator itr(RootDir, QDir::NoDotAndDotDot | QDir::Dirs, QDirIterator::Subdirectories);
     while(itr.hasNext()) {
         itr.next();
         QString dir = QString(itr.fileInfo().absoluteFilePath()).replace(0, RootDir.size() - 1, "") + "/";
-        if (dir.indexOf(OutputDir) != -1) {
-            continue;
-        }
         list.push_back(dir.replace(0, 1, ""));
     }
     return list;
@@ -304,9 +306,9 @@ QStringList Project::listDirs()
 QStringList Project::listFiles()
 {
     QStringList list;
-    if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
-        RootDir += "/";
-    }
+    //if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
+    //    RootDir += "/";
+    //}
 
     QDirIterator itr(RootDir, filter, QDir::Files, QDirIterator::Subdirectories);
 
@@ -317,32 +319,66 @@ QStringList Project::listFiles()
     return list;
 }
 
+QFileInfoList Project::listDirContent(QString dir, QStringList strFilter)
+{
+    QFileInfoList list;
+    QDirIterator itr(dir, strFilter, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+
+    while(itr.hasNext()) {
+        itr.next();
+        list << itr.fileInfo();
+    }
+    return list;
+}
+
 void Project::projectFileSystem()
 {
-    QStringList dirs = listDirs();
-    dirs.push_front("");
-    if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
-        RootDir += "/";
+//    QStringList dirs = listDirs();
+//    dirs.push_front("");
+//    if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
+//        RootDir += "/";
+//    }
+//    int i = 0;
+//    for (auto &dir_it : dirs) {
+//        if (dir_it.isEmpty()) {
+//            QStringList list = listDirContent(RootDir + dir_it, filter);
+//            RootItem->insertChild();
+//        }
+//        else {
+//            QStringList list = listDirContent(RootDir + dir_it, filter);
+////            RootItem->child(dir_it)->insertChildren(list);
+//        }
+//    }
+}
+
+void Project::buildTree(Item *item, QString dir, QStringList strFilter)
+{
+    if(dir.at(dir.size() != 0 ? dir.size() - 1 : 0) != '/') {
+        dir += "/";
     }
 
-    for (auto &dir_it : dirs) {
-        QString dirPath = RootDir + dir_it;
-        QDirIterator itr(dirPath, filter, QDir::Files | QDir::Dirs);
-        QStringList list;
-        while(itr.hasNext()) {
-            itr.next();
+    QDir folder(dir);
+    folder.setFilter(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    folder.setNameFilters(strFilter);
+    folder.setSorting(QDir::DirsFirst);
+    QFileInfoList list = folder.entryInfoList();
+//    std::sort(list.begin(), list.end(), [](QFileInfo &a, QFileInfo &b){
+//        if (a.isDir()) {
+//            return true;
+//        }
+//        if (b.isDir()) {
+//            return true;
+//        }
+//        return false;
+//    });
 
-//            if(dir_it.isEmpty()) {
-
-//            }
-//            else {
-
-//            }
-                    list << QString(itr.fileInfo().absoluteFilePath()).replace(0, RootDir.size(), "");
+    for (auto &list_it : list) {
+        item->insertChild(item->getChildCount(), new Item(list_it));
+        if (list_it.isDir()) {
+            buildTree(item->getChild(item->getChildCount() - 1), list_it.absoluteFilePath(), strFilter);
         }
-        RootItem->insertChildren(list);
     }
-//    return list;
+
 }
 
 QString Project::getLinkerScript() const
@@ -355,14 +391,14 @@ void Project::setLinkerScript(const QString &value)
     LinkerScript = value;
 }
 
-void Project::setRootItem(const ProjectItem *value)
+void Project::setRootItem(const Item *value)
 {
     *RootItem = *value;
 }
 
-ProjectItem *Project::getRootItem() const
+Item *Project::getRootItem() const
 {
-    return RootItem;//static_cast<ProjectItem*>(&RootItem);
+    return RootItem;//static_cast<Item*>(&RootItem);
 }
 
 QString Project::getOutputDir() const
