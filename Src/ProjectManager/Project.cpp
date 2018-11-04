@@ -279,8 +279,8 @@ void Project::generateProject()
     }
 
     make.generate();
-
-    RootItem->~Item();
+    RootItem->removeChildren();
+    delete RootItem;
     RootItem = new Item(QFileInfo(RootDir));
     buildTree(RootItem, RootDir, filter);
 
@@ -331,24 +331,19 @@ QFileInfoList Project::listDirContent(QString dir, QStringList strFilter)
     return list;
 }
 
-void Project::projectFileSystem()
+bool Project::removeDir(QString dir)
 {
-//    QStringList dirs = listDirs();
-//    dirs.push_front("");
-//    if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
-//        RootDir += "/";
-//    }
-//    int i = 0;
-//    for (auto &dir_it : dirs) {
-//        if (dir_it.isEmpty()) {
-//            QStringList list = listDirContent(RootDir + dir_it, filter);
-//            RootItem->insertChild();
-//        }
-//        else {
-//            QStringList list = listDirContent(RootDir + dir_it, filter);
-////            RootItem->child(dir_it)->insertChildren(list);
-//        }
-//    }
+    QFileInfoList list = Project::Project::listDirContent(dir, QStringList());
+    bool res = false;
+    for (auto &it : list) {
+        if (it.isDir()) {
+            res = removeDir(dir);
+        }
+        else {
+            QFile().remove(it.absoluteFilePath());
+        }
+    }
+    return QDir().rmdir(dir) && res;
 }
 
 void Project::buildTree(Item *item, QString dir, QStringList strFilter)
@@ -362,23 +357,12 @@ void Project::buildTree(Item *item, QString dir, QStringList strFilter)
     folder.setNameFilters(strFilter);
     folder.setSorting(QDir::DirsFirst);
     QFileInfoList list = folder.entryInfoList();
-//    std::sort(list.begin(), list.end(), [](QFileInfo &a, QFileInfo &b){
-//        if (a.isDir()) {
-//            return true;
-//        }
-//        if (b.isDir()) {
-//            return true;
-//        }
-//        return false;
-//    });
-
     for (auto &list_it : list) {
         item->insertChild(item->getChildCount(), new Item(list_it));
         if (list_it.isDir()) {
             buildTree(item->getChild(item->getChildCount() - 1), list_it.absoluteFilePath(), strFilter);
         }
     }
-
 }
 
 QString Project::getLinkerScript() const

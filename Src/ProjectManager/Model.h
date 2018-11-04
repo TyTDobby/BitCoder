@@ -14,7 +14,7 @@ namespace Project {
 class Model : public QAbstractItemModel
 {
 public:
-    Model(QObject *parent = nullptr);
+    Model(QObject *parent = 0);
 
 public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -24,7 +24,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 
     void addProject(Project pro);
-
+    void refreshProject(QModelIndex index, Project pro);
 private:
     Item *root;
 };

@@ -88,6 +88,11 @@ void Item::removeChild(Item *child)
     children.removeOne(child);
 }
 
+void Item::removeChildren()
+{
+    qDeleteAll(children);
+}
+
 Item *Item::getChild(int row) const
 {
     Q_ASSERT(row < getChildCount());

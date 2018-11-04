@@ -6,10 +6,6 @@ Model::Model(QObject *parent)
     : QAbstractItemModel(parent)
 {
     root = new Item();
-//    root->insertChild(0, new Item());
-//    root->insertChild(1, new Item());
-//    root->insertChild(2, new Item());
-//    root->getChild(0)->insertChild(0, new Item());
 }
 
 QModelIndex Model::index(int row, int column, const QModelIndex &parent) const
@@ -98,6 +94,16 @@ void Model::addProject(Project pro)
 {
     beginResetModel();
     root->insertChild(root->getChildCount(), pro.getRootItem());
+    endResetModel();
+}
+
+void Model::refreshProject(QModelIndex index, Project pro)
+{
+    beginResetModel();
+    int tmpRow = index.row();
+    root->removeChild(static_cast<Item *>(index.internalPointer()));
+    pro.generateProject();
+    root->insertChild(tmpRow, pro.getRootItem());
     endResetModel();
 }
 

@@ -57,7 +57,8 @@ public:
 
     QStringList listDirs();
     QStringList listFiles();
-    QFileInfoList listDirContent(QString dir, QStringList strFilter);
+    static QFileInfoList listDirContent(QString dir, QStringList strFilter);
+    static bool removeDir(QString dir);
     void projectFileSystem();
 
 

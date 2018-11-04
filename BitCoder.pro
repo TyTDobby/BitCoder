@@ -32,7 +32,7 @@ INCLUDEPATH += Src/ProjectManager/
 RESOURCES += qdarkstyle/style.qrc \
     Resources/Common.qrc
 
-CONFIG += c++0x
+CONFIG += c++0x c++11
 
 HEADERS += \
     Src/Base/BitCoder.h \

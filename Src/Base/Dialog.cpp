@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <QApplication>
 
-Dialog::Dialog(QWidget *parent) : FrameBase(parent)
+Dialog::Dialog(QString dir, QWidget *parent) : FrameBase(parent)
 {
     setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint | windowFlags());
     setWindowButtons(Closed);
@@ -59,16 +59,16 @@ Dialog::Dialog(QWidget *parent) : FrameBase(parent)
 
     vBoxMain->setMargin(5);
 
-    model->setFilter(QDir::Dirs | QDir::Files | QDir::NoDot);
-    model->setSorting(QDir::Type);
 
+    model->setFilter(QDir::Dirs | QDir::Files | QDir::NoDot);
+    model->setSorting(QDir::DirsFirst);
     view->setModel(model);
-    view->setRootIndex(model->index(QDir::homePath()));
+    changeDir(model->index(dir));
 
     viewHard->setFixedWidth(static_cast<int>(this->width() * 0.2));
     viewHard->setModel(modelHard);
 
-    editDirectory->setText(QDir::homePath());
+   // editDirectory->setText(dir);
 
     cmbType->addItem("Dirs");
 
@@ -104,6 +104,10 @@ void Dialog::changeDir(QModelIndex index)
     editDirectory->clear();
     editDirectory->setText(model->filePath(index));
     view->setRootIndex(index);
+    QModelIndex selIndex = modelHard->index(QDir(index.data().toString()).root().path());
+    qDebug() << selIndex.data();
+    view->setRootIndex(selIndex);
+    //viewHard->selectionModel()->select(selIndex, QItemSelectionModel::SelectionFlag::Select);
 }
 
 void Dialog::changeText(QString text)

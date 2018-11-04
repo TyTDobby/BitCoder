@@ -4,22 +4,7 @@
 #include <QLayout>
 #include <QRegExpValidator>
 
-#include <QTemporaryFile>
-
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/json_parser.hpp>
-
 #include "Dialog.h"
-
-//namespace pt = boost::property_tree;
-
-//Compiler addComnpiler (QString name, QString mask, QString path) {
-//    Compiler compiler;
-//    compiler.name = name;
-//    compiler.mask = mask;
-//    compiler.path = path;
-//    return compiler;
-//}
 
 CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 {
@@ -40,30 +25,25 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     btnBack = new QPushButton("Back", this);
     btnBrowse = new QPushButton("Browse...", this);
     crPro = new CreateProject(this);
-//    btnCompilerPath = new QPushButton("Browse...", this);
     wgName = new QWidget(this);
     wgCrystal = new QWidget(this);
     wgFolders = new QWidget(this);
-//    wgCompiler = new QWidget(this);
     editName = new QLineEdit(this);
     editPath = new QLineEdit(this);
     editInc = new QLineEdit(this);
-//    editOutput = new QLineEdit(this);
     editLibs = new QLineEdit(this);
     editOther = new QLineEdit(this);
     editSrc = new QLineEdit(this);
-//    editCompilerPath = new QLineEdit(this);
-//    editCompilerName = new QLineEdit(this);
     title = new QLabel(this);
     editInfo = new QTextEdit(this);
     downloader = new Downloader(this);
     progress = new QProgressBar(this);
+
     QVBoxLayout *luMain = new QVBoxLayout();
     QHBoxLayout *luButtons = new QHBoxLayout();
     QVBoxLayout *luCentral = new QVBoxLayout();
     QHBoxLayout *luCrystal = new QHBoxLayout();
     QVBoxLayout *luFolders = new QVBoxLayout();
-//    QVBoxLayout *luCompiler = new QVBoxLayout();
     QFormLayout *luName = new QFormLayout();
     QHBoxLayout *lu = new QHBoxLayout();
     QVBoxLayout *lu_1 = new QVBoxLayout();
@@ -71,17 +51,11 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     QFormLayout *lu_3 = new QFormLayout();
     QFormLayout *lu_4 = new QFormLayout();
     QHBoxLayout *lu_5 = new QHBoxLayout();
-//    QHBoxLayout *lu_6 = new QHBoxLayout();
-//    QHBoxLayout *lu_7 = new QHBoxLayout();
     QSpacerItem *spacer = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Fixed);
     QSpacerItem *spacer_1 = new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Expanding);
-//    QLabel *seria = new QLabel("Seria", this);
-//    QLabel *crystalName = new QLabel("Crystal", this);
     QLabel *label = new QLabel("Library", this);
     QLabel *label_1 = new QLabel("Driver and tools", this);
     QComboBox *boxLib = new QComboBox(this);
-
-//    QString appPath = QApplication::applicationDirPath();
 
     selectLayout(luMain);
 
@@ -95,24 +69,19 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     luButtons->addWidget(btnNext);
     luButtons->addWidget(btnCancel);
 
-//    luCentral->addWidget(title);
     luCentral->addWidget(startView);
     luCentral->addWidget(wgName);
     luCentral->addWidget(wgCrystal);
     luCentral->addWidget(wgFolders);
-//    luCentral->addWidget(wgCompiler);
-//    luCentral->addSpacerItem(spacer_1);
     luCentral->addWidget(progress);
 
     wgName->setLayout(luName);
     wgCrystal->setLayout(luCrystal);
     wgFolders->setLayout(luFolders);
-//    wgCompiler->setLayout(luCompiler);
 
     wgName->setVisible(false);
     wgCrystal->setVisible(false);
     wgFolders->setVisible(false);
-//    wgCompiler->setVisible(false);
 
     /* 1 step */
     lu->addWidget(editPath);
@@ -121,7 +90,6 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     luName->addRow("Name: " , editName);
     luName->addRow("Path: ", lu);
     luName->addWidget(&checkDefault);
-
     /* 1 step */
 
     /* 2 step */
@@ -157,24 +125,7 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     lu_4->addRow("Other", editOther);
     /* 3 step */
 
-    /* 4 step */
-//    luCompiler->addLayout(lu_7);
-//    luCompiler->addLayout(lu_6);
-//    luCompiler->addSpacerItem(new QSpacerItem(2, 2, QSizePolicy::Fixed, QSizePolicy::Expanding));
-
-//    lu_6->addWidget(new QLabel("Directory:"));
-//    lu_6->addWidget(editCompilerPath);
-//    lu_6->addWidget(btnCompilerPath);
-
-//    lu_7->addWidget(new QLabel("Name:"));
-//    lu_7->addWidget(editCompilerName);
-
-    /* 4 step */
-
     title->setVisible(false);
-//    QFont font(title->font().family(), 10);
-//    font.setWeight(99);
-//    title->setFont(font);
 
     listCreate << "New\nfile" << "Project\nSTM8" << "Project\nSTM32";
     QStringList listIcon;
@@ -230,7 +181,6 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
 
     progress->setVisible(false);
 
-
     dataBase.connectToDataBase(QDir::temp().absoluteFilePath("STM.db"));
 
     checkDefault.setText("Directory default");
@@ -247,17 +197,6 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
     editOther->setText("Other");
 
     libs << "None(CMSIS)" << "StdPerish" << "Cube HAL";
-
-#ifdef Q_OS_WIN
-    //defaultDir = "C:/";
-#endif
-
-#ifdef Q_OS_LINUX
-    QDir binDir("/usr/bin/");
-#endif
-
-
-//    QStringList listFiles = binDir.entryList(QDir::Files);
 
     setTitleText("New file or project");
 
@@ -279,8 +218,6 @@ CreateWidget::CreateWidget(QWidget *parent) : FrameBase(parent)
             SLOT(selectionCrystal(QModelIndex)));
     connect(btnBrowse, SIGNAL(clicked(bool)),
             SLOT(browse()));
-//    connect(btnCompilerPath, SIGNAL(clicked(bool)),
-//            SLOT(browseCompiler()));
     connect(editName, SIGNAL(textChanged(QString)),
             SLOT(pathProject(QString)));
     connect(boxLib, SIGNAL(currentIndexChanged(QString)),
@@ -337,7 +274,6 @@ void CreateWidget::step(int index)
         setTitleText("Location");
         wgCrystal->setVisible(false);
         wgFolders->setVisible(false);
-//        wgCompiler->setVisible(false);
         btnBack->setVisible(false);
         break;
     case 1:
@@ -345,7 +281,6 @@ void CreateWidget::step(int index)
         wgCrystal->setVisible(true);
         setTitleText("Crystal");
         wgFolders->setVisible(false);
-//        wgCompiler->setVisible(false);
         btnBack->setVisible(true);
         btnNext->setText("Next");
         break;
@@ -354,26 +289,9 @@ void CreateWidget::step(int index)
         wgCrystal->setVisible(false);
         setTitleText("Folders");
         wgFolders->setVisible(true);
-//        wgCompiler->setVisible(false);
         btnNext->setText("Finish");
         break;
     case 3:
-//        wgName->setVisible(false);
-//        wgCrystal->setVisible(false);
-//        setTitleText("Compiler");
-//        wgFolders->setVisible(false);
-//        wgCompiler->setVisible(true);
-//        btnNext->setText("Finish");
-
-//        if (typeProject == Project::Project_STM32) {
-//            editCompilerName->setText("arm-none-eabi-gcc");
-//        }
-//        else if (typeProject == Project::Project_STM8) {
-//            editCompilerName->setText("sdcc");
-//        }
-
-//        break;
-    case 4:
         finish();
         break;
 
@@ -383,7 +301,6 @@ void CreateWidget::step(int index)
 void CreateWidget::finish()
 {
     if (!isFile) {
-//        QString linkerScriptDir = "Linker";
         QFileInfo linkerFile(":/Linker/stm3210x.ld");
 
         hide();
@@ -391,8 +308,6 @@ void CreateWidget::finish()
                 SLOT(done(Project::Project)));
         Project::Project project(editName->text(), editPath->text());
 
-//        project.setCompilerName(editCompilerName->text());
-//        project.setCompilerPath(editCompilerPath->text());
         project.setCoreSTM32(coreSTM32.replace("ARM ", "").toLower());
         project.setTypeProject(typeProject);
         project.setOutputDir("Build");
@@ -497,14 +412,6 @@ void CreateWidget::browse()
             SLOT(browsePath(QString)));
 }
 
-//void CreateWidget::browseCompiler()
-//{
-//    Dialog *dialog = new Dialog();
-//    dialog->show();
-//    connect(dialog, SIGNAL(result(QString)),
-//            editCompilerPath, SLOT(setText(QString)));
-//}
-
 void CreateWidget::done(Project::Project pro)
 {
     crPro->close();
@@ -547,11 +454,6 @@ void CreateWidget::downloadProgress(int total)
     progress->setValue(total);
 }
 
-//void CreateWidget::compilerPath(QString &value)
-//{
-
-//}
-
 void CreateWidget::browsePath(QString path)
 {
     editPath->setText(path + editName->text());
@@ -562,4 +464,3 @@ void CreateWidget::closeEvent(QCloseEvent *event)
     QWidget::closeEvent(event);
     dataBase.closeDataBase();
 }
-

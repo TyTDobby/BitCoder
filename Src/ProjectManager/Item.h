@@ -61,6 +61,7 @@ public:
     void insertChild(int row, Item *child);
     void appendChild(Item *child);
     void removeChild(Item *child);
+    void removeChildren();
 
     Item *getChild(int row) const;
     int getChildCount() const;

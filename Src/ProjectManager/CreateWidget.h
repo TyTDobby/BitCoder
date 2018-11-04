@@ -33,12 +33,6 @@
 #define DATASHEET      7
 #define CORE           6
 
-//typedef struct {
-//    QString name;
-//    QString mask;
-//    QString path;
-//} Compiler;
-
 typedef struct {
     QString Seria;
     QStringList Crystals;
@@ -58,7 +52,6 @@ private:
     QPushButton *btnCancel, *btnNext, *btnBack, *btnBrowse;// *btnCompilerPath;
     QListView *startView, *seriaView, *crystalView, *viewDrivers, *coreView;
     QLineEdit *editPath, *editName, *editInc, *editSrc, *editLibs, *editOther;
-//    QLineEdit *editCompilerPath, *editCompilerName;
     CreateProject *crPro;
     QLabel *title;
     QTextEdit *editInfo;
@@ -69,7 +62,6 @@ private:
     QCheckBox checkDefault;
     Downloader *downloader;
     QProgressBar *progress;
-//    QVector<Compiler> compilers;
     QMap<QString, STM32> stm32;
 
     QString coreSTM32, selSeria, info, defaultDir;
@@ -96,10 +88,9 @@ public slots:
     void selectLib(const QString &select);
     void download(const QByteArray &byte);
     void downloadProgress(int total);
-//    void compilerPath(QString &value);
     void browsePath(QString path);
-//    void browseCompiler();
     void done(Project::Project);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
