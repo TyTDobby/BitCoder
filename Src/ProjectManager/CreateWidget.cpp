@@ -304,22 +304,22 @@ void CreateWidget::finish()
         QFileInfo linkerFile(":/Linker/stm3210x.ld");
 
         hide();
-        connect(crPro, SIGNAL(done(Project::Project)),
-                SLOT(done(Project::Project)));
-        Project::Project project(editName->text(), editPath->text());
+        connect(crPro, SIGNAL(done(Project::Project*)),
+                SLOT(done(Project::Project*)));
+        Project::Project *project = new Project::Project(editPath->text());
 
-        project.setCoreSTM32(coreSTM32.replace("ARM ", "").toLower());
-        project.setTypeProject(typeProject);
-        project.setOutputDir("Build");
-        project.setLinkerScript(linkerFile.absoluteFilePath());
+        project->setCoreSTM32(coreSTM32.replace("ARM ", "").toLower());
+        project->setTypeProject(typeProject);
+        project->setOutputDir("Build");
+        project->setLinkerScript(linkerFile.absoluteFilePath());
 
-        project.setDirs(QStringList()
-                        << editInc->text()
-                        << editLibs->text()
-                        << editOther->text()
-                        << editSrc->text()
-                        << "Startup"
-                        << linkerFile.dir().dirName());
+        project->setDirs(QStringList()
+                         << editInc->text()
+                         << editLibs->text()
+                         << editOther->text()
+                         << editSrc->text()
+                         << "Startup"
+                         << linkerFile.dir().dirName());
         //project.setFilter(QStringList() << "*.c");
         crPro->show();
         crPro->generation(project);
@@ -412,7 +412,7 @@ void CreateWidget::browse()
             SLOT(browsePath(QString)));
 }
 
-void CreateWidget::done(Project::Project pro)
+void CreateWidget::done(Project::Project *pro)
 {
     crPro->close();
     close();

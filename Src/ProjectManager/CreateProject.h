@@ -21,10 +21,10 @@ class CreateProject : public FrameBase
 public:
     CreateProject(FrameBase *parent = NULL);
 
-    void generation(Project::Project project);
+    void generation(Project::Project *project);
 
 signals:
-    void done(Project::Project);
+    void done(Project::Project*);
 
 private:
     QProgressBar *bar;

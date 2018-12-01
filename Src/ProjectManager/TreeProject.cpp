@@ -16,10 +16,10 @@ TreeProject::TreeProject(QWidget *parent) : QWidget(parent)
     LineDelegate *delegate = new LineDelegate();
     vBoxMain->addWidget(view);
 
-    Project::Project pro("123", QDir::homePath() + "/123");
-    pro.setTypeProject(Project::Project_STM32);
-    pro.generateProject();
-
+    Project::Project *pro = new Project::Project("/media/tytdobby/Hard/data/123/");
+    pro->setTypeProject(Project::Project_STM32);
+    pro->generateProject();
+    qDebug() << pro->parsing().msg;
     addProject(pro);
 
     view->setModel(model);
@@ -34,11 +34,24 @@ TreeProject::TreeProject(QWidget *parent) : QWidget(parent)
             SLOT(open(QModelIndex)));
     connect(view, SIGNAL(customContextMenuRequested(QPoint)),
             SLOT(contextMenu(QPoint)));
-
 }
 
-void TreeProject::addProject(Project::Project pro)
+TreeProject::~TreeProject()
 {
+    qDeleteAll(projects);
+    delete view;
+    delete model;
+}
+
+void TreeProject::addProject(Project::Project *pro)
+{
+    connect(pro, &Project::Project::changeProject,
+            [=](Project::Project *pro){
+
+        QModelIndex index = model->indexProject(pro->getRootItem());
+        model->refreshProject(index, pro);
+        view->setExpanded(index, true);
+    });
     projects.push_back(pro);
     model->addProject(pro);
 }
@@ -64,6 +77,30 @@ QModelIndex TreeProject::getRootIndex(QModelIndex index)
     return index;
 }
 
+void TreeProject::saveState(void)
+{
+//    QStringList List;
+
+//    for (QModelIndex index : model->) {
+//        if (view->isExpanded(index)) {
+//            List << index.data(Qt::DisplayRole).toString();
+//        }
+//    }
+}
+
+void TreeProject::restoreState(void)
+{
+//    QStringList list;
+
+//    for(auto &it : list) {
+//        QModelIndexList Items = model->match(model->index(0, 0), Qt::DisplayRole, QVariant::fromValue(it));
+//        if (!Items.isEmpty()) {
+//            view->setExpanded(Items.first(), true);
+//        }
+//    }
+}
+
+
 void TreeProject::contextMenu(QPoint pos)
 {
 
@@ -76,27 +113,18 @@ void TreeProject::contextMenu(QPoint pos)
                                                           root,
                                                           this);
         menu->popup(view->viewport()->mapToGlobal(pos));
-        connect(menu, SIGNAL(refresh(QModelIndex)),
-                SLOT(refresh(QModelIndex)));
+        connect(menu, &DirFileContextMenu::refresh,
+                [=](QModelIndex index){
+            model->refreshProject(index, projects.at(static_cast<size_t>(index.row())));
+            view->setExpanded(index, true);
+        });
     }
     else {
-        ProjectContextMenu *menu = new ProjectContextMenu(index,
+        ProjectContextMenu *menu = new ProjectContextMenu(projects.at(static_cast<size_t>(index.row())),
                                                           this);
-//        Project::Project pro = projects.at(index.row());
-//        pro.generateProject();
-        model->refreshProject(index, projects.at(index.row()));
-        //projects.erase(projects.begin() + index.row());
-//        projects.push_back(pro);
+
         menu->popup(view->viewport()->mapToGlobal(pos));
     }
-}
-
-void TreeProject::refresh(QModelIndex index)
-{
-    Project::Project pro = projects.at(index.row());
-    projects.erase(projects.begin() + index.row());
-    pro.generateProject();
-    projects.push_back(pro);
 }
 
 DirFileContextMenu::DirFileContextMenu(QFileInfo info,
@@ -120,13 +148,13 @@ void DirFileContextMenu::handler(QAction *ac)
 {
     QString text = ac->text();
     if (text == list.at(0)->text()) { // Show in folder
-        QDesktopServices::openUrl(QUrl::fromLocalFile(info.absolutePath()));
+        //QDesktopServices::openUrl(QUrl::fromLocalFile(info.absolutePath()));
     }
     else if (text == list.at(1)->text()) { // Add new
 
     }
     else if (text == list.at(2)->text()) { // Rename
-//        QDe
+
     }
     else if (text == list.at(3)->text()) { // Delete
         if (info.isDir()) {
@@ -137,26 +165,23 @@ void DirFileContextMenu::handler(QAction *ac)
         }
         if (!QDir(info.absoluteFilePath()).exists()) {
             emit refresh(index);
-            //QThread::msleep(1000);
-           // pro->generateProject();
         }
     }
 }
 
-ProjectContextMenu::ProjectContextMenu(QModelIndex index,
+ProjectContextMenu::ProjectContextMenu(Project::Project *pro,
                                        QWidget *parent)
     : QMenu(parent)
 {
-    list << new QAction("Build \"" + index.data().toString() + "\"", this)
+    list << new QAction("Build \"" + pro->getTargetName() + "\"", this)
          << new QAction("Clean", this)
-         << new QAction("Refresh", this)
-         << new QAction("Show in folder", this)
+         //<< new QAction("Refresh", this)
          << new QAction("Show in folder", this)
          << new QAction("Add new", this)
          << new QAction("Rename", this)
          << new QAction("Delete", this)
-         << new QAction("Close \"" + index.data().toString() + "\"", this);
-    this->index = index;
+         << new QAction("Close \"" + pro->getTargetName() + "\"", this);
+    this->pro = pro;
     addActions(list);
 
     connect(this, SIGNAL(triggered(QAction*)),
@@ -167,34 +192,25 @@ void ProjectContextMenu::handler(QAction *ac)
 {
     QString text = ac->text();
     if (text == list.at(0)->text()) { //Build
-       // QDesktopServices::openUrl(QUrl::fromLocalFile(info.absolutePath()));
+
     }
     else if (text == list.at(1)->text()) { // Clean
 
     }
-    else if (text == list.at(2)->text()) { // Refresh
-//        Project::Project *tmp = new Project::Project(QFileInfo(pro->getRootDir()).fileName(),
-//                                                     pro->getRootDir());
-//        tmp->setOutputDir(pro->getRootDir());
-//        tmp->setTypeProject(pro->getTypeProject());
-//        tmp
-        //pro->generateProject();
-        //emit refresh(index);
+    else if (text == list.at(2)->text()) { // Show in folder
+        //QDesktopServices::openUrl(QUrl::fromLocalFile(pro->getRootDir()));
     }
-    else if (text == list.at(2)->text()) { // Rename
-//        QDe
+    else if (text == list.at(3)->text()) { // Add new
+
     }
-    else if (text == list.at(3)->text()) { // Delete
-//        qDebug() << info.absoluteFilePath();
-//        if (!info.isDir()) {
-//            QDir dir(info.absoluteFilePath());
-//            dir.remove(info.absoluteFilePath());
-//        }
-//        else {
-//            QFile file(info.absoluteFilePath());
-//            file.remove();
-//        }
-//        emit refresh();
+    else if (text == list.at(4)->text()) { // Rename
+
+    }
+    else if (text == list.at(5)->text()) { // Delete
+
+    }
+    else if (text == list.at(6)->text()) { // Close
+
     }
 }
 

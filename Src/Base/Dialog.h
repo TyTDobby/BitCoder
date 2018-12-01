@@ -17,7 +17,7 @@ class Dialog : public FrameBase
 {
     Q_OBJECT
 public:
-    explicit Dialog(QString dir = QDir::homePath(), QWidget *parent = NULL);
+    explicit Dialog(QString dir = QDir::homePath(), QWidget *parent = nullptr);
 
 //    void setRootPath();
 //    QString getPath();

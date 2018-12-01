@@ -1,17 +1,52 @@
 #include "Project.h"
 
+#include <regex>
+
 #include <QApplication>
 #include <QDebug>
 
 namespace Project
 {
 
-Project::Project(QString NameTarget, QString RootDir)
+std::ptrdiff_t find_regex(std::string str, std::regex re)
 {
-    this->NameTarget = NameTarget;
-    this->RootDir = RootDir;
+    return std::distance(  // Count the number of matches inside the iterator
+            std::sregex_iterator(str.begin(), str.end(), re),
+            std::sregex_iterator());
+}
+
+Project::Project(QString RootDir)
+{
     debugLevel = Level_4;
     RootItem = new Item(QFileInfo(RootDir));
+    Watcher = new QFileSystemWatcher();
+
+
+
+    Root.setFile(RootDir);
+    RootFile = findCMakeListsRoot(RootDir);
+
+    qDebug() << findCMakeLists(RootDir).size();
+    Watcher->addPaths(listDirsWithAbsolutePath(RootDir));
+
+    connect(Watcher, &QFileSystemWatcher::directoryChanged,
+            [=](const QString &path) {
+        if (QFileInfo(path).isDir()) {
+            QStringList list = listDirsWithAbsolutePath(path);
+            if (!list.isEmpty()) {
+                Watcher->addPaths(list);
+            }
+        }
+        emit changeProject(this);
+    });
+
+
+}
+
+Project::~Project()
+{
+    delete RootItem;
+    delete Watcher;
 }
 
 QString Project::getCompilerName() const
@@ -95,27 +130,30 @@ void Project::setLinkerFlags(const QStringList &value)
     linker.Flags = value;
 }
 
-void Project::generateProject()
+ProjectState Project::generateProject()
 {
+    /*
     Makefile::Generator make;
 
     make.setBuildDir(OutputDir);
     make.setRootDir(RootDir);
-    make.setTargetName(NameTarget);
+    make.setTargetName(TargetName);
 
     QStringList dirs = listDirs();
 
     if (typeProject == Project_STM32) {
         compiler.Path = QApplication::applicationDirPath() + "/arm-gcc/bin/";
-//        if (LinkerScript) {
-            LinkerScript.replace(":/", "");
-//        }
 
-
+        if (LinkerScript.startsWith(":/")) {
+            LinkerScript.replace(":/Linker/LinkerScript", "/Linker");
+        }
+        else if (LinkerScript.isNull()) {
+            LinkerScript = "/Linker/stm3210x.ld";
+        }
 
         QFile linkerFile(RootDir + LinkerScript);
 
-        LinkerScript.replace("Linker", ":/Linker/LinkerScript");
+        LinkerScript.replace("/Linker", ":/Linker/LinkerScript");
         QFile tmpFile(LinkerScript);
 
         linkerFile.open(QIODevice::WriteOnly);
@@ -281,24 +319,68 @@ void Project::generateProject()
     make.generate();
     RootItem->removeChildren();
     delete RootItem;
-    RootItem = new Item(QFileInfo(RootDir));
-    buildTree(RootItem, RootDir, filter);
+    RootItem = new Item(Root);
+    buildTree(RootItem, Root.absoluteFilePath(), filter);
+    */
+    return ProjectState();
+}
 
+ProjectState Project::parsing()
+{
+
+    QFile file(RootFile.absoluteFilePath());
+    if (!file.open(QIODevice::ReadOnly)) {
+        return ProjectState(ProjectCode::CMakeFilesDontExist, "Could not found CMakeFiles.txt in " + Root.absoluteFilePath() + "!");
+    }
+
+    std::string content = file.readAll().toStdString();
+
+    /* Find project name */
+
+    std::ptrdiff_t index = find_regex(content, std::regex("project\\(\\w{1,}\\)"));
+    index += std::string("project(").size() - 1;
+    TargetName.clear();
+    for (uint64_t i = static_cast<uint64_t>(index); i < content.length() && content.at(i) != ')'; i++) {
+        TargetName += content.at(i);
+    }
+
+    //if (index == std::string::npos) {
+    //    return ProjectState(ProjectCode::CouldnotProName, "Could not found project name!");
+    //}
+
+    //TargetName = content.
+
+    qDebug() << TargetName;
+
+
+
+
+    return ProjectState(ProjectCode::Success);
 }
 
 QStringList Project::listDirs()
 {
 
     QStringList list;
-    //if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
-   //     RootDir += "/";
-   // }
 
-    QDirIterator itr(RootDir, QDir::NoDotAndDotDot | QDir::Dirs, QDirIterator::Subdirectories);
+    QDirIterator itr(Root.absoluteFilePath(), QDir::NoDotAndDotDot | QDir::Dirs, QDirIterator::Subdirectories);
     while(itr.hasNext()) {
         itr.next();
-        QString dir = QString(itr.fileInfo().absoluteFilePath()).replace(0, RootDir.size() - 1, "") + "/";
+        QString dir = QString(itr.fileInfo().absoluteFilePath()).replace(0, Root.absoluteFilePath().size() - 1, "") + "/";
         list.push_back(dir.replace(0, 1, ""));
+    }
+    return list;
+}
+
+QStringList Project::listDirsWithAbsolutePath(QString path)
+{
+
+    QStringList list;
+
+    QDirIterator itr(path, QDir::NoDotAndDotDot | QDir::Dirs, QDirIterator::Subdirectories);
+    while(itr.hasNext()) {
+        itr.next();
+        list.push_back(itr.fileInfo().absoluteFilePath());
     }
     return list;
 }
@@ -306,15 +388,12 @@ QStringList Project::listDirs()
 QStringList Project::listFiles()
 {
     QStringList list;
-    //if(RootDir.lastIndexOf("/") != RootDir.size() - 1) {
-    //    RootDir += "/";
-    //}
 
-    QDirIterator itr(RootDir, filter, QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator itr(Root.absoluteFilePath(), filter, QDir::Files, QDirIterator::Subdirectories);
 
     while(itr.hasNext()) {
         itr.next();
-        list << QString(itr.fileInfo().absoluteFilePath()).replace(0, RootDir.size(), "");
+        list << QString(itr.fileInfo().absoluteFilePath()).replace(0, Root.absoluteFilePath().size(), "");
     }
     return list;
 }
@@ -344,6 +423,28 @@ bool Project::removeDir(QString dir)
         }
     }
     return QDir().rmdir(dir) && res;
+}
+
+QFileInfo Project::findCMakeListsRoot(QString dir)
+{
+    QDirIterator it(dir, QStringList() << "CMakeLists.txt",
+                        QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    if(it.hasNext()) {
+        it.next();
+    }
+    return it.fileInfo();
+}
+
+QFileInfoList Project::findCMakeLists(QString dir)
+{
+    QFileInfoList list;
+    QDirIterator itr(dir, QStringList() << "CMakeLists.txt", QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
+
+    while(itr.hasNext()) {
+        itr.next();
+        list.append(itr.fileInfo());
+    }
+    return list;
 }
 
 void Project::buildTree(Item *item, QString dir, QStringList strFilter)
@@ -382,7 +483,7 @@ void Project::setRootItem(const Item *value)
 
 Item *Project::getRootItem() const
 {
-    return RootItem;//static_cast<Item*>(&RootItem);
+    return RootItem;
 }
 
 QString Project::getOutputDir() const
@@ -397,22 +498,22 @@ void Project::setOutputDir(const QString &value)
 
 QString Project::getRootDir() const
 {
-    return RootDir;
+    return Root.absoluteFilePath();
 }
 
 void Project::setRootDir(const QString &value)
 {
-    RootDir = value;
+    Root.setFile(value);
 }
 
-QString Project::getNameTarget() const
+QString Project::getTargetName() const
 {
-    return NameTarget;
+    return TargetName;
 }
 
-void Project::setNameTarget(const QString &value)
+void Project::setTargetName(const QString &value)
 {
-    NameTarget = value;
+    TargetName = value;
 }
 
 QStringList Project::getDirs() const

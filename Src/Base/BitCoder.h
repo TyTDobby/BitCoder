@@ -20,7 +20,7 @@ private:
 
 private slots:
     void createFileOrPro();
-
+    void openFolder();
 
 
 };

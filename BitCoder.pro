@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui sql network
-QT += testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,8 +25,12 @@ DEFINES +=  QT_DEBUG_PLUGINS
 #LIBS += \
 #       -lboost_system\
 
+#LIBS += -lclang
+
+#INCLUDEPATH += /usr/lib/llvm-3.8/include
 INCLUDEPATH += Src/Base/
 INCLUDEPATH += Src/ProjectManager/
+INCLUDEPATH += Src/Editor/
 
 RESOURCES += qdarkstyle/style.qrc \
     Resources/Common.qrc
@@ -50,7 +53,12 @@ HEADERS += \
     Src/Base/DirModel.h \
     Src/ProjectManager/CreateProject.h \
     Src/ProjectManager/Model.h \
-    Src/ProjectManager/Item.h
+    Src/ProjectManager/Item.h \
+    Src/Base/Console.h \
+    Src/Editor/EditorBase.h \
+    Src/Editor/Autocomplete.h \
+    Src/Editor/Highlighter.h \
+    Src/Editor/word.h
 
 SOURCES += \
     Src/Base/BitCoder.cpp \
@@ -68,4 +76,8 @@ SOURCES += \
     Src/Base/DirModel.cpp \
     Src/ProjectManager/CreateProject.cpp \
     Src/ProjectManager/Model.cpp \
-    Src/ProjectManager/Item.cpp
+    Src/ProjectManager/Item.cpp \
+    Src/Base/Console.cpp \
+    Src/Editor/EditorBase.cpp \
+    Src/Editor/Autocomplete.cpp \
+    Src/Editor/Highlighter.cpp

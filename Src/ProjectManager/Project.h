@@ -4,14 +4,17 @@
 #include <vector>
 #include <iterator>
 
+#include <QObject>
+#include <QString>
 #include <QDirIterator>
 #include <QVector>
 #include <QMap>
+#include <QFileSystemWatcher>
+
 #include "GenerateMakefile.h"
 #include "Item.h"
 
 namespace Project {
-
 
 typedef enum {
     FlagLinker,
@@ -47,20 +50,51 @@ struct SystemBuild{
 typedef SystemBuild Compiler;
 typedef SystemBuild Linker;
 
-class Project
+enum class ProjectCode
 {
+    NoState,
+    CMakeFilesDontExist,
+    Success,
+    CouldnotProName
+
+};
+
+class ProjectState {
 public:
-    Project(QString NameTarget, QString RootDir);
+    ProjectState()
+    {
+        this->msg = "";
+        this->code = ProjectCode::NoState;
+    }
 
+    ProjectState(ProjectCode code, QString msg = "")
+    {
+        this->msg = msg;
+        this->code = code;
+    }
 
-    void generateProject();
+    QString msg;
+    ProjectCode code;
+};
+
+class Project : public QObject
+{
+    Q_OBJECT
+public:
+    Project(QString RootDir);
+    ~Project();
+
+    ProjectState generateProject();
+    ProjectState parsing();
 
     QStringList listDirs();
+    QStringList listDirsWithAbsolutePath(QString path);
     QStringList listFiles();
     static QFileInfoList listDirContent(QString dir, QStringList strFilter);
     static bool removeDir(QString dir);
     void projectFileSystem();
-
+    QFileInfoList findCMakeLists(QString dir);
+    QFileInfo findCMakeListsRoot(QString dir);
 
     QStringList getCompilerFlags() const;
     void setCompilerFlags(const QStringList &value);
@@ -74,8 +108,8 @@ public:
     QString getRootDir() const;
     void setRootDir(const QString &value);
 
-    QString getNameTarget() const;
-    void setNameTarget(const QString &value);
+    QString getTargetName() const;
+    void setTargetName(const QString &value);
 
     QStringList getDirs() const;
     void setDirs(const QStringList &value);
@@ -111,7 +145,8 @@ public:
     void setRootItem(const Item *value);
 
 private:
-    QString NameTarget, RootDir, OutputDir, LinkerScript;
+    QString TargetName, OutputDir, LinkerScript;
+    QFileInfo Root, RootFile;
     QStringList exception, dirs;
     Compiler compiler;
     Linker linker;
@@ -121,8 +156,13 @@ private:
     QStringList filter;
     QStringList files;
     Item *RootItem;
+    QFileSystemWatcher *Watcher;
 
     void buildTree(Item *item, QString dir, QStringList strFilter);
+
+signals:
+    void changeProject(Project *);
+
 };
 
 }

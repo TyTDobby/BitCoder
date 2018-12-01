@@ -14,15 +14,13 @@
 #include <fstream>
 #include <string>
 
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/json_parser.hpp>
-
-//namespace pt = boost::property_tree;
+#include "Console.h"
+#include "EditorBase.h"
 
 BitCoder::BitCoder(FrameBase *parent)
     : FrameBase(parent)
 {
-    QTextEdit *edit = new QTextEdit();
+    EditorBase *edit = new EditorBase();
     QVBoxLayout *boxMain = new QVBoxLayout();
 
     QMenuBar *menuBar = new QMenuBar(this);
@@ -36,11 +34,17 @@ BitCoder::BitCoder(FrameBase *parent)
     QAction *acExit = new QAction("Exit", fileMenu);
 
     QHBoxLayout *hBoxTree = new QHBoxLayout();
+    QVBoxLayout *vBoxEditCls = new QVBoxLayout();
+
+    Console *console = new Console(this);
 
     treeProject = new TreeProject();
 
+    vBoxEditCls->addWidget(edit);
+    vBoxEditCls->addWidget(console);
+
     hBoxTree->addWidget(treeProject);
-    hBoxTree->addWidget(edit);
+    hBoxTree->addLayout(vBoxEditCls);
 
     boxMain->addWidget(menuBar);
     boxMain->addLayout(hBoxTree);
@@ -58,7 +62,7 @@ BitCoder::BitCoder(FrameBase *parent)
     menuBar->addMenu(fileMenu);
     menuBar->addMenu(editMenu);
 
-
+    console->setFixedHeight(150);
 
     std::string fileSetting = "/home/alex/BitCoder-Deb000000000000000000000000000000000000000000000000000000000000ug/ex.json";
 
@@ -70,18 +74,18 @@ BitCoder::BitCoder(FrameBase *parent)
 //    }
 //    else {
 //        pt::ptree root;
-        try {
-            //read_json(fileSetting.c_str(), root);
-        }
-        catch (std::exception exp) {
-            MessageBox *box = new MessageBox(FatalError, this);
-            box->showMessage(QString("File \"%1\" no exist").arg(fileSetting.c_str()));
-            connect(box, SIGNAL(fatalError()),
-                    SLOT(close()));
-            box->show();
-            while (!isHidden());
+//        try {
+//            //read_json(fileSetting.c_str(), root);
+//        }
+//        catch (std::exception exp) {
+//            MessageBox *box = new MessageBox(FatalError, this);
+//            box->showMessage(QString("File \"%1\" no exist").arg(fileSetting.c_str()));
+//            connect(box, SIGNAL(fatalError()),
+//                    SLOT(close()));
+//            box->show();
+//            while (!isHidden());
 
-        }
+//        }
 
 //        write_json(std::cout, root);
 //    }
@@ -98,6 +102,8 @@ BitCoder::BitCoder(FrameBase *parent)
 
     connect(acCreateFile, SIGNAL(triggered(bool)),
             SLOT(createFileOrPro()));
+    connect(acOpenFile, &QAction::triggered,
+            this, &BitCoder::openFolder);
 
     connect(acExit, SIGNAL(triggered(bool)),
             SLOT(close()));
@@ -112,11 +118,24 @@ BitCoder::~BitCoder()
 
 }
 
+void BitCoder::openFolder()
+{
+    Dialog *dl = new Dialog();
+    connect(dl, &Dialog::result,
+            this, [=](QString path) {
+        Project::Project *pro = new Project::Project(path);
+        pro->generateProject();
+        this->treeProject->addProject(pro);
+    });
+    dl->show();
+
+}
+
 void BitCoder::createFileOrPro()
 {
     CreateWidget *createWidget = new CreateWidget();
-    connect(createWidget, SIGNAL(projectReady(Project::Project)),
-            treeProject, SLOT(addProject(Project::Project)));
+    connect(createWidget, SIGNAL(projectReady(Project::Project*)),
+            treeProject, SLOT(addProject(Project::Project*)));
 //    Dialog *dialog = new Dialog();
 //    dialog->show();
 

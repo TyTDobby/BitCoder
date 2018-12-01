@@ -74,7 +74,7 @@ private:
     void finish();
 
 signals:
-    void projectReady(Project::Project);
+    void projectReady(Project::Project*);
 
 public slots:
     void selectionItem(const QModelIndex &index);
@@ -89,7 +89,7 @@ public slots:
     void download(const QByteArray &byte);
     void downloadProgress(int total);
     void browsePath(QString path);
-    void done(Project::Project);
+    void done(Project::Project*);
 
 protected:
     void closeEvent(QCloseEvent *event);

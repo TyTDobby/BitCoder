@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QVariant>
+#include <QList>
+#include <QString>
 
 namespace Project {
 
@@ -42,14 +44,11 @@ namespace Project {
 
 //};
 
-#include <QList>
-#include <QString>
-
 class Item
 {
 public:
-    explicit Item(Item *_parent = 0);
-    explicit Item(QFileInfo value, Item *_parent = 0);
+    explicit Item(Item *_parent = nullptr);
+    explicit Item(QFileInfo value, Item *_parent = nullptr);
     ~Item();
 
     void setRow(int row);

@@ -1,5 +1,7 @@
 #include "Model.h"
 
+#include <QDebug>
+
 namespace Project {
 
 Model::Model(QObject *parent)
@@ -29,6 +31,20 @@ QModelIndex Model::index(int row, int column, const QModelIndex &parent) const
     else
         return QModelIndex();
 
+}
+
+QModelIndex Model::indexProject(Item *RootItem) const
+{
+    if (!RootItem)
+        return QModelIndex();
+
+    for (int i = 0; i < root->getChildCount(); i++) {
+        if (root->getChild(i) == RootItem) {
+            return createIndex(i, 0, RootItem);
+        }
+    }
+
+    return QModelIndex();
 }
 
 QModelIndex	Model::parent(const QModelIndex &index) const
@@ -90,21 +106,34 @@ QVariant Model::data(const QModelIndex &index, int role) const
     }
 }
 
-void Model::addProject(Project pro)
+void Model::addProject(Project *pro)
 {
     beginResetModel();
-    root->insertChild(root->getChildCount(), pro.getRootItem());
+    root->insertChild(root->getChildCount(), pro->getRootItem());
     endResetModel();
 }
 
-void Model::refreshProject(QModelIndex index, Project pro)
+void Model::refreshProject(QModelIndex index, Project *pro)
 {
     beginResetModel();
+
+    //root->removeChild(static_cast<Item *>(index.internalPointer()));
+
     int tmpRow = index.row();
     root->removeChild(static_cast<Item *>(index.internalPointer()));
-    pro.generateProject();
-    root->insertChild(tmpRow, pro.getRootItem());
+    pro->generateProject();
+    root->insertChild(tmpRow, pro->getRootItem());
     endResetModel();
+}
+
+Item *Model::getProject(QModelIndex index)
+{
+    if (index.row() >= root->getChildCount()) {
+        qWarning() << "Out of range: Model!";
+        return NULL;
+    }
+    return root->getChild(index.row());
+
 }
 
 }

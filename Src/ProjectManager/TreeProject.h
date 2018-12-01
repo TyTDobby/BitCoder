@@ -21,23 +21,26 @@ class TreeProject : public QWidget
     Q_OBJECT
 public:
     TreeProject(QWidget *parent = 0);
+    ~TreeProject();
 
 private:
     QTreeView *view;
     Project::Model *model;
-    std::vector<Project::Project> projects;
+    std::vector<Project::Project *> projects;
     QList<QAction *> dirActions, fileActions, projectActions;
 
     QModelIndex getRootIndex(QModelIndex index);
+    void restoreState();
+    void saveState();
 
 signals:
     void openFile(QString);
 
 public slots:
-    void addProject(Project::Project pro);
+    void addProject(Project::Project *pro);
     void open(QModelIndex index);
     void contextMenu(QPoint pos);
-    void refresh(QModelIndex index);
+//    void refresh(QModelIndex index);
 
 };
 
@@ -67,7 +70,7 @@ class ProjectContextMenu : public QMenu
 {
     Q_OBJECT
 public:
-    ProjectContextMenu(QModelIndex index,
+    ProjectContextMenu(Project::Project *pro,
                        QWidget *parent);
 
 signals:

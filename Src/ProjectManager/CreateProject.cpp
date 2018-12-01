@@ -29,19 +29,19 @@ CreateProject::CreateProject(FrameBase *parent) : FrameBase(parent)
 
 }
 
-void CreateProject::generation(Project::Project project)
+void CreateProject::generation(Project::Project *project)
 {
     bar->setValue(0);
     bar->setFormat("Creating dirs");
     QDir dir;
-    dir.mkdir(project.getRootDir());
-    for (auto &it : project.getDirs()) {
-        dir.mkdir(project.getRootDir() + "/" + it);
+    dir.mkdir(project->getRootDir());
+    for (auto &it : project->getDirs()) {
+        dir.mkdir(project->getRootDir() + "/" + it);
     }
     bar->setValue(50);
     bar->setFormat("Generating Makefile");
 
-    project.generateProject();
+    project->generateProject();
 
     bar->setValue(100);
     bar->setFormat("Done");

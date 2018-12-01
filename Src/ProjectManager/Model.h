@@ -23,10 +23,15 @@ public:
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
 
-    void addProject(Project pro);
-    void refreshProject(QModelIndex index, Project pro);
+    QModelIndex indexProject(Item *RootItem) const;
+
+    void addProject(Project *pro);
+    void refreshProject(QModelIndex index, Project *pro);
+    Item *getProject(QModelIndex index);
+
 private:
     Item *root;
+
 };
 
 }
